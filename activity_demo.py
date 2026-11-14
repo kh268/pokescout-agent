@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import os
 import uuid
 from pathlib import Path
 
@@ -20,14 +21,16 @@ async def run(args: argparse.Namespace) -> None:
     try:
         if args.research:
             from research import research_market
-            context = store.issue_context(job_id, "pokescout-research", ["research.*"], parent_span_id=job_id)
+            context = store.issue_context(job_id, "pokescout-research", ["research.*"], parent_span_id=job_id,
+                publish_url=os.getenv("ACTIVITY_PUBLISH_URL", "http://127.0.0.1:18082/internal/v1/activity/events"))
             request = json.loads(args.request.read_text(encoding="utf-8"))
             report = await research_market(request, activity_context=context)
             print(json.dumps({"run_id": report["run_id"], "research_status": report["status"]}), flush=True)
             state = "failed" if report["status"] == "failed" else "succeeded"
         else:
             for producer, operation in (("image-agent", "identify.card"), ("pokescout-research", "research.search")):
-                context = store.issue_context(job_id, producer, [operation], parent_span_id=job_id)
+                context = store.issue_context(job_id, producer, [operation], parent_span_id=job_id,
+                    publish_url=os.getenv("ACTIVITY_PUBLISH_URL", "http://127.0.0.1:18082/internal/v1/activity/events"))
                 span_id = "span_" + uuid.uuid4().hex
                 async with ActivityEmitter(context) as emitter:
                     emitter.emit("step.started", operation, "Synthetic transport demonstration; no provider call.", span_id=span_id, parent_span_id=job_id)

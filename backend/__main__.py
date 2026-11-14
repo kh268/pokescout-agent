@@ -28,6 +28,7 @@ def main() -> None:
         os.environ["GEMINI_API_KEY"] = os.environ["GOOGLE_API_KEY"]
     if args.research_url:
         os.environ["RESEARCH_AGENT_URL"] = args.research_url
+    os.environ.setdefault("ACTIVITY_PUBLISH_URL", f"http://127.0.0.1:{args.port}/internal/v1/activity/events")
     settings = Settings(data_dir=args.data_dir, identify_enabled=bool(os.getenv("GEMINI_API_KEY")),
                         research_enabled=bool(os.getenv("RESEARCH_AGENT_URL")),
                         fixture_listings=json.loads(args.fixtures.read_text(encoding="utf-8")) if args.fixtures else [],

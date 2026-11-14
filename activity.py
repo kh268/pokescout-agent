@@ -17,7 +17,7 @@ from datetime import datetime, timezone
 from typing import AsyncIterator
 
 HEADER = "X-PokeScout-Activity"
-DEFAULT_PUBLISH_URL = "http://127.0.0.1:18082/internal/v1/activity/events"
+DEFAULT_PUBLISH_URL = "http://127.0.0.1:8000/internal/v1/activity/events"
 LOGGER = logging.getLogger(__name__)
 CURRENT: ContextVar[ActivityEmitter | None] = ContextVar("activity_emitter", default=None)
 PARENT: ContextVar[str | None] = ContextVar("activity_parent", default=None)

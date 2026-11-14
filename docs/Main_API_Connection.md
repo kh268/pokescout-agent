@@ -9,15 +9,19 @@ or duplicate the teammate implementation. Job results and lifecycle SSE retain
 the existing API envelope and persistence.
 
 The API snapshots session-owned copies and active reservations, passes complete
-research reports, and supplies an empty facts sidecar until explicit listing
-confirmation is implemented. Missing printing/fee/condition facts remain
+research reports, and supplies session-owned listing confirmations from
+`POST /api/v1/research-reports/{run_id}/listing-confirmations`.
+Missing printing/fee/condition facts remain
 unconfirmed, so insufficient-evidence decisions are expected and correct.
 Fixture demonstrations retain their existing deterministic path.
 
 Main-agent artifacts/checkpoints persist under
 `data/main-agent/<session-owner-hash>/`. Session-owned copies and reservations
-are supplied by the API. The child job uses the outer job ID as its idempotency
-key and runs directly; no additional polling worker is started.
+are supplied by the API. Child attempts use the outer job ID, revision and goal
+digest as idempotency keys and run directly; no additional polling worker starts.
+Child `awaiting_input` questions are translated into the frontend question fields;
+the child is cancelled and the outer job waits. Answering resumes the same outer
+job and starts a fresh child attempt with the updated constraints.
 
 For a replacement main-agent implementation, inject `Settings(main_agent=fn)`.
 `fn(goal, copies, reports, reservations)` is a synchronous callable returning the
@@ -28,5 +32,5 @@ start a second job scheduler or duplicate research inside this callback.
 Failed standalone research reports are retained and mark their job failed;
 partial research reports remain successful completed jobs with partial results.
 
-Remaining integration: an authorized listing-facts confirmation API, detailed
-main-agent step activity, and frontend consumption. Live trading remains disabled.
+Remaining integration: detailed main-agent step activity and frontend consumption.
+Live trading remains disabled.
