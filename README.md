@@ -2,6 +2,11 @@
 
 A Python agent for physical Pokémon card collection, marketplace research and budget decisions. This release updates the earlier ZIP to the current architecture: models extract evidence; Python owns purchase calculations; Playwright is isolated behind an explicit test-execution adapter.
 
+The new persistent main-agent workflow is available through `python pokescout.py agent`.
+See [main-agent setup and boundaries](docs/Main_Agent.md), or run
+`python pokescout.py agent --data-dir runs/main-agent-demo demo` with Python 3.11+
+for a complete synthetic research, decision, draft and HTTP test-order flow.
+
 **Start with the reproducible local demo. It needs no API keys and performs no real transactions.**
 
 ```bash
