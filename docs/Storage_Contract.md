@@ -7,6 +7,17 @@ It supplements `Research_Agent_Contract.md` and
 `Decision_Trading_Agent_Contract.md`; it does not silently change their current
 Python or HTTP schemas.
 
+Public progress follows [Activity_Stream_Contract.md](Activity_Stream_Contract.md).
+Its central append-only activity journal is an additive application-owned table
+in `data/collection.sqlite3`, implemented by `activity_server.py`. Supporting
+tables hold job ownership scopes, publisher token hashes, session hashes,
+rate buckets and retention cursors. `backend/activity.py` uses the application's
+existing sessions and job-write hook. Job state
+and backend lifecycle events commit in the same transaction. Public events are
+safe projections/references, not substitutes for private research source text,
+immutable reports, ownership records or the cash ledger. AgentField's internal
+execution store is not the application's shared activity journal.
+
 ## Scope and locations
 
 Single user, one local application instance, Japanese cards and integer JPY
