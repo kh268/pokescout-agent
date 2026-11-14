@@ -11,12 +11,12 @@ from decisions import plan
 from selling import draft
 
 COMMANDS={'identify','add','collection','psa-compare','plan','sell','demo','browser-demo'}
-def load(path):return json.loads(Path(path).read_text())
+def load(path):return json.loads(Path(path).read_text(encoding='utf-8'))
 def output(value,path=None):
     text=json.dumps(value,ensure_ascii=False,indent=2)+'\n'
     if path:
         p=Path(path);p.parent.mkdir(parents=True,exist_ok=True)
-        with p.open('x') as f:f.write(text)
+        with p.open('x', encoding='utf-8') as f:f.write(text)
     print(text)
 def fresh_directory(path):
     p=Path(path)

@@ -29,11 +29,11 @@ def execute_fixture(goal,listings,selected_ids):
         if url.scheme!='https' or url.username or url.password or url.port not in (None,443) or not (url.hostname or '').endswith('.daytona.io'):
             raise RuntimeError('Unexpected toolbox URL; credentials not forwarded.')
         root=Path(__file__).parent
-        files={name:(root/name).read_text() for name in ('cards.py','collection.py','core.py','fixture_market.py')}
+        files={name:(root/name).read_text(encoding='utf-8') for name in ('cards.py','collection.py','core.py','fixture_market.py')}
         payload={'goal':goal,'listings':listings,'selected':selected_ids}
         code='FILES='+repr(files)+'\nPAYLOAD='+repr(payload)+'''\nimport json,pathlib,sys,tempfile
 root=pathlib.Path(tempfile.mkdtemp(prefix='pokescout-fixture-'))
-for name,body in FILES.items():(root/name).write_text(body)
+for name,body in FILES.items():(root/name).write_text(body,encoding='utf-8')
 sys.path.insert(0,str(root))
 from fixture_market import run_browser_fixture
 result=run_browser_fixture(PAYLOAD['goal'],PAYLOAD['listings'],PAYLOAD['selected'],root/'out')

@@ -25,7 +25,7 @@ class Run:
     def emit(self,provider,event,**details):
         row=redact({'at':now(),'provider':provider,'event':event,**details})
         self.events.append(row)
-        with (self.path/'trace.jsonl').open('a') as f:
+        with (self.path/'trace.jsonl').open('a', encoding='utf-8') as f:
             f.write(json.dumps(row,ensure_ascii=False)+'\n')
         print(f"[{row['at'][11:19]}] {provider:<9} {event}",flush=True)
         if provider in self.sponsors and self.sponsors[provider]=='not called':
@@ -50,8 +50,8 @@ class Run:
                           'Sold listing labels are not verified settlement records.',
                           'Investor exit prices are explicit assumptions, not predictions.',
                           'Marketplace access permission must be established for production use.']})
-        (self.path/'report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
-        (self.path/'summary.md').write_text(summary(report))
+        (self.path/'report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n', encoding='utf-8')
+        (self.path/'summary.md').write_text(summary(report), encoding='utf-8')
         print('\n'+status.upper()+f" · {len(records)} listings inspected · ¥{plan.get('cost_jpy',0):,} selected")
         print('Evidence: '+str(self.path.resolve()/'report.json'))
         return report
@@ -59,7 +59,7 @@ class Run:
 
 def load_job(args,model=None):
     if args.request:
-        d=json.loads(Path(args.request).read_text())
+        d=json.loads(Path(args.request).read_text(encoding='utf-8'))
     elif model:
         if args.budget is None or not args.goal:
             raise ValueError('Use --request FILE, or provide --goal, --budget and --mode.')
@@ -183,7 +183,7 @@ def full_run(args):
 
 
 def replan(args):
-    previous=json.loads(Path(args.report).read_text())
+    previous=json.loads(Path(args.report).read_text(encoding='utf-8'))
     job=load_job(args)
     run=Run(args.out,args.goal or 'Re-analyze saved observations under updated user constraints')
     records=[classify(row,job) for row in previous.get('listings',[])]
@@ -230,6 +230,9 @@ def main():
 
 
 if __name__=='__main__':
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, 'reconfigure'):
+            stream.reconfigure(encoding='utf-8')
     try:
         raise SystemExit(main())
     except (ValueError, OSError, RuntimeError) as e:

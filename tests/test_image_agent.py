@@ -15,7 +15,7 @@ from cards import DEFAULT_GEMINI_MODEL, identify
 from image_agent import recognize_card
 
 ROOT = Path(__file__).resolve().parents[1]
-CARD = json.loads((ROOT / 'examples/v2/owned-card.json').read_text())
+CARD = json.loads((ROOT / 'examples/v2/owned-card.json').read_text(encoding='utf-8'))
 
 
 class ImageAgentTests(unittest.TestCase):
@@ -86,7 +86,7 @@ class ImageAgentTests(unittest.TestCase):
                                      'not-read.png', '--out', str(out)],
                                     env=env, capture_output=True, text=True)
             self.assertEqual(result.returncode, 2)
-            self.assertEqual(json.loads(out.read_text())['error']['code'], 'MISSING_API_KEY')
+            self.assertEqual(json.loads(out.read_text(encoding='utf-8'))['error']['code'], 'MISSING_API_KEY')
             self.assertNotIn('Traceback', result.stderr)
 
     def sdk(self, response_text):

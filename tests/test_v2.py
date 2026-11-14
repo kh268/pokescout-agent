@@ -18,7 +18,7 @@ from providers import Nosana
 from daytona_browser import execute_fixture
 
 ROOT=Path(__file__).resolve().parents[1]
-def fixture(name):return json.loads((ROOT/'examples/v2'/name).read_text())
+def fixture(name):return json.loads((ROOT/'examples/v2'/name).read_text(encoding='utf-8'))
 
 class NewWorkflowTests(unittest.TestCase):
     def setUp(self):
