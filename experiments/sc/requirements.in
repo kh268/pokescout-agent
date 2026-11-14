@@ -1,0 +1,8 @@
+langchain>=1,<2
+langchain-openai>=1,<2
+langchain-google-genai>=4,<5
+langchain-tavily>=0.2,<1
+python-dotenv>=1,<2
+agentfield==0.1.145
+httpx>=0.28,<1
+pydantic>=2.7,<3
