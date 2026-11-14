@@ -1,0 +1,77 @@
+{
+  "app": "PokéScout autonomous research prototype",
+  "goal": "Re-analyze saved observations under updated user constraints",
+  "status": "reanalysis of recorded observations; not refreshed",
+  "request": {
+    "mode": "investor",
+    "budget_jpy": 30000,
+    "reserve_jpy": 5000,
+    "near_mint_only": true,
+    "fee_rate": 0.1,
+    "exit_shipping_jpy": 250,
+    "targets": [
+      {
+        "name_ja": "ピカチュウ",
+        "number": "173/165",
+        "rarity": "AR",
+        "key": "ピカチュウ 173/165 AR"
+      }
+    ]
+  },
+  "listings": [
+    {
+      "url": "https://jp.mercari.com/item/m48331619457",
+      "title": "ピカチュウ AR SV2a ポケモンカード151 173/165",
+      "price": 2300.0,
+      "currency": "JPY",
+      "availability": "available",
+      "shipping_jpy": 0,
+      "condition": "unknown",
+      "observed_at": "2026-11-14T05:43:31.812750+00:00",
+      "method": "direct-public-html-jsonld",
+      "source_sha256": "c0138e2253d3fcd0c89cc36168a35ce036703c003a98299fae87901569debc96",
+      "evidence": {
+        "price": "2300",
+        "availability": "InStock",
+        "condition": "",
+        "shipping": "送料込み(出品者負担)"
+      },
+      "target": "ピカチュウ 173/165 AR",
+      "reasons": [
+        "Seller condition does not meet requested near-mint filter"
+      ],
+      "eligible": false,
+      "authenticity": "not authenticated; condition is seller-claimed",
+      "total_jpy": 2300,
+      "break_even_jpy": 2834,
+      "scenario_net_jpy": null,
+      "seller_damage_warning": false
+    }
+  ],
+  "plan": {
+    "urls": [],
+    "cost_jpy": 0,
+    "score": 0,
+    "cash_remaining_jpy": 30000,
+    "objective": "net outcome under user-supplied exit assumptions",
+    "scope": "best among retrieved, eligible listings; not the entire market",
+    "forecast": "No trained price forecast or guaranteed resale profit."
+  },
+  "completed_at": "2026-11-14T05:52:13.269273+00:00",
+  "sponsors": {
+    "Tavily": "not called",
+    "Nosana": "not called",
+    "CodeAF": "not called",
+    "Daytona": "not called"
+  },
+  "errors": [],
+  "analysis": null,
+  "trade_execution": "none",
+  "limitations": [
+    "Source pages may change or be cached by a provider.",
+    "Seller condition is not independent authentication.",
+    "Sold listing labels are not verified settlement records.",
+    "Investor exit prices are explicit assumptions, not predictions.",
+    "Marketplace access permission must be established for production use."
+  ]
+}

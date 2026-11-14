@@ -1,0 +1,19 @@
+{
+  "name": "Fixture duplicate C",
+  "set": "SYNTHETIC DEMO SET",
+  "number": "003/099",
+  "language": "Japanese",
+  "variant": "AR",
+  "year": null,
+  "brand": null,
+  "presentation": "raw",
+  "grader": null,
+  "grade": null,
+  "grade_text": null,
+  "cert_number": null,
+  "qualifiers": [],
+  "defects": [
+    "裏面の左下に白かけがあります。"
+  ],
+  "uncertainties": []
+}

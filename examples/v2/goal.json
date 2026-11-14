@@ -1,0 +1,48 @@
+{
+  "source_mode": "synthetic_fixture",
+  "budget_jpy": 10000,
+  "reserve_jpy": 1000,
+  "avoid_owned": true,
+  "targets": [
+    {
+      "card": {
+        "name": "Fixture card A",
+        "set": "SYNTHETIC DEMO SET",
+        "number": "001/099",
+        "language": "Japanese",
+        "variant": "AR",
+        "year": null,
+        "brand": null,
+        "presentation": "raw",
+        "grader": null,
+        "grade": null,
+        "grade_text": null,
+        "cert_number": null,
+        "qualifiers": [],
+        "defects": [],
+        "uncertainties": []
+      },
+      "quantity": 1
+    },
+    {
+      "card": {
+        "name": "Fixture card B",
+        "set": "SYNTHETIC DEMO SET",
+        "number": "002/099",
+        "language": "Japanese",
+        "variant": "AR",
+        "year": null,
+        "brand": null,
+        "presentation": "raw",
+        "grader": null,
+        "grade": null,
+        "grade_text": null,
+        "cert_number": null,
+        "qualifiers": [],
+        "defects": [],
+        "uncertainties": []
+      },
+      "quantity": 1
+    }
+  ]
+}

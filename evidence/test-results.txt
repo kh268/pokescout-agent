@@ -1,0 +1,23 @@
+test_ambiguous_booleans_and_card_number_substrings_rejected (test_agent.EvidenceTests.test_ambiguous_booleans_and_card_number_substrings_rejected) ... ok
+test_cleanup_failure_is_visible_in_report (test_agent.EvidenceTests.test_cleanup_failure_is_visible_in_report) ... ok
+test_collector_completion_and_unique_printings (test_agent.EvidenceTests.test_collector_completion_and_unique_printings) ... ok
+test_damage_evidence_survives_replanning (test_agent.EvidenceTests.test_damage_evidence_survives_replanning) ... ok
+test_disallowed_urls_and_credentials_rejected (test_agent.EvidenceTests.test_disallowed_urls_and_credentials_rejected) ... ok
+test_full_provider_contract_with_mock_responses (test_agent.EvidenceTests.test_full_provider_contract_with_mock_responses) ... ok
+test_generated_policy_cannot_override_budget_or_eligibility (test_agent.EvidenceTests.test_generated_policy_cannot_override_budget_or_eligibility) ... ok
+test_investor_optimization_beats_greedy_roi (test_agent.EvidenceTests.test_investor_optimization_beats_greedy_roi) ... ok
+test_llm_values_require_exact_evidence (test_agent.EvidenceTests.test_llm_values_require_exact_evidence) ... ok
+test_missing_configuration_stops_before_network (test_agent.EvidenceTests.test_missing_configuration_stops_before_network) ... ok
+test_no_investment_valuation_is_invented (test_agent.EvidenceTests.test_no_investment_valuation_is_invented) ... ok
+test_numeric_quote_cannot_justify_different_price (test_agent.EvidenceTests.test_numeric_quote_cannot_justify_different_price) ... ok
+test_primary_price_shipping_and_exact_match (test_agent.EvidenceTests.test_primary_price_shipping_and_exact_match) ... ok
+test_sandbox_failure_still_requests_cleanup (test_agent.EvidenceTests.test_sandbox_failure_still_requests_cleanup) ... ok
+test_secrets_removed_from_results (test_agent.EvidenceTests.test_secrets_removed_from_results) ... ok
+test_sold_is_not_a_buy_recommendation (test_agent.EvidenceTests.test_sold_is_not_a_buy_recommendation) ... ok
+test_unknown_shipping_not_assumed_free (test_agent.EvidenceTests.test_unknown_shipping_not_assumed_free) ... ok
+test_wrong_rarity_and_graded_bundle_excluded (test_agent.EvidenceTests.test_wrong_rarity_and_graded_bundle_excluded) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.015s
+
+OK

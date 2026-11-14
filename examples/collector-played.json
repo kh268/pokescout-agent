@@ -1,0 +1,9 @@
+{
+  "mode": "collector",
+  "budget_jpy": 10000,
+  "reserve_jpy": 1000,
+  "near_mint_only": false,
+  "targets": [
+    {"name_ja": "ピカチュウ", "number": "173/165", "rarity": "AR", "owned": false}
+  ]
+}

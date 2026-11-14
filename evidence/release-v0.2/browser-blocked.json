@@ -1,0 +1,136 @@
+{
+  "version": "0.2.0",
+  "mode": "synthetic_fixture",
+  "identification": "fixture JSON; Gemini not called",
+  "collection": [
+    {
+      "id": "copy-75345c8ed57c",
+      "card": {
+        "name": "Fixture duplicate C",
+        "set": "SYNTHETIC DEMO SET",
+        "number": "003/099",
+        "language": "Japanese",
+        "variant": "AR",
+        "year": null,
+        "brand": null,
+        "presentation": "raw",
+        "grader": null,
+        "grade": null,
+        "grade_text": null,
+        "cert_number": null,
+        "qualifiers": [],
+        "defects": [
+          "裏面の左下に白かけがあります。"
+        ],
+        "uncertainties": []
+      },
+      "image_hash": null,
+      "cost": 1200,
+      "allow_sale": true,
+      "state": "owned",
+      "created": "2026-11-14T07:17:11.151663+00:00"
+    }
+  ],
+  "plan": {
+    "engine": "deterministic-python-v0.2",
+    "selected_ids": [
+      "A2",
+      "B1"
+    ],
+    "cost_jpy": 8900,
+    "remaining_allowance_jpy": 1100,
+    "reserve_jpy": 1000,
+    "checked": [
+      {
+        "id": "A1",
+        "identity": "[\"fixture card a\", \"synthetic demo set\", \"001/099\", \"japanese\", \"ar\"]",
+        "total_jpy": 4000,
+        "reasons": [],
+        "eligible": true,
+        "source_url": "fixture://A1",
+        "observed_at": null
+      },
+      {
+        "id": "A2",
+        "identity": "[\"fixture card a\", \"synthetic demo set\", \"001/099\", \"japanese\", \"ar\"]",
+        "total_jpy": 3900,
+        "reasons": [],
+        "eligible": true,
+        "source_url": "fixture://A2",
+        "observed_at": null
+      },
+      {
+        "id": "A3",
+        "identity": "[\"fixture card a\", \"synthetic demo set\", \"001/099\", \"japanese\", \"reverse\"]",
+        "total_jpy": 2800,
+        "reasons": [
+          "WRONG_PRINTING_LANGUAGE_OR_VARIANT"
+        ],
+        "eligible": false,
+        "source_url": "fixture://A3",
+        "observed_at": null
+      },
+      {
+        "id": "B1",
+        "identity": "[\"fixture card b\", \"synthetic demo set\", \"002/099\", \"japanese\", \"ar\"]",
+        "total_jpy": 5000,
+        "reasons": [],
+        "eligible": true,
+        "source_url": "fixture://B1",
+        "observed_at": null
+      },
+      {
+        "id": "B2",
+        "identity": "[\"fixture card b\", \"synthetic demo set\", \"002/099\", \"japanese\", \"ar\"]",
+        "total_jpy": null,
+        "reasons": [
+          "ACQUISITION_TOTAL_UNKNOWN"
+        ],
+        "eligible": false,
+        "source_url": "fixture://B2",
+        "observed_at": null
+      },
+      {
+        "id": "B3",
+        "identity": "[\"fixture card b\", \"synthetic demo set\", \"002/099\", \"japanese\", \"ar\"]",
+        "total_jpy": 4000,
+        "reasons": [
+          "NOT_AVAILABLE"
+        ],
+        "eligible": false,
+        "source_url": "fixture://B3",
+        "observed_at": null
+      }
+    ],
+    "source_mode": "synthetic_fixture",
+    "execution": "none; current availability and total must be rechecked",
+    "scope": "best among supplied eligible single-card offers; no forecast"
+  },
+  "sale_draft": {
+    "copy_id": "copy-75345c8ed57c",
+    "price_jpy": 1800,
+    "title": "Fixture duplicate C SYNTHETIC DEMO SET 003/099 Japanese AR",
+    "description": "name: Fixture duplicate C\nset: SYNTHETIC DEMO SET\nnumber: 003/099\nlanguage: Japanese\nvariant: AR\npresentation: raw\nqualifiers: []\ndefects: [\"裏面の左下に白かけがあります。\"]\n\n状態・注意事項:\n- 裏面の左下に白かけがあります。\n鑑定・真贋: 本アプリによる現物の真贋確認は行っていません。\n発送方法・発送時期: 出品前に確認してください。",
+    "nosana_suggestion_for_review": null,
+    "required_defects": [
+      "裏面の左下に白かけがあります。"
+    ],
+    "publish_ready": false,
+    "execution": "draft only; no marketplace listing submitted",
+    "generation": "deterministic template; no AI called"
+  },
+  "providers": {
+    "Gemini": "not called",
+    "Tavily": "not called",
+    "Nosana": "not called",
+    "CodeAF": "not called",
+    "Daytona": "not called"
+  },
+  "live_marketplace_transactions": 0,
+  "status": "partial; browser step failed",
+  "browser": {
+    "status": "failed",
+    "error": "Chromium launch failed: process_singleton_posix socket() Operation not permitted in the build host. No successful browser run.",
+    "note": "No successful browser execution is claimed. Inspect any persistent fixture action ledger before retry."
+  }
+}

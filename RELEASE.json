@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "tests_passed": 43,
+  "verification": {
+    "local_fixture_demo": "passed",
+    "test_marketplace_http_roundtrip": "passed",
+    "provider_contracts": "mocked only",
+    "gemini_live": "not run; key absent",
+    "nosana_live": "not run; key absent",
+    "tavily_live": "not run; key absent",
+    "daytona_live": "not run; key absent",
+    "playwright_browser_end_to_end": "blocked by build-host Chromium socket restriction",
+    "real_marketplace_transactions": 0
+  },
+  "specification": "docs/PokeScout_Product_Plan.md"
+}

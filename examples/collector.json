@@ -1,0 +1,11 @@
+{
+  "mode": "collector",
+  "budget_jpy": 10000,
+  "reserve_jpy": 1000,
+  "near_mint_only": true,
+  "targets": [
+    {"name_ja": "ピカチュウ", "number": "173/165", "rarity": "AR", "owned": false},
+    {"name_ja": "ヒトカゲ", "number": "168/165", "rarity": "AR", "owned": false},
+    {"name_ja": "ゼニガメ", "number": "170/165", "rarity": "AR", "owned": false}
+  ]
+}

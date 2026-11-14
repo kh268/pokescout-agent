@@ -1,0 +1,48 @@
+test_ambiguous_booleans_and_card_number_substrings_rejected (test_agent.EvidenceTests.test_ambiguous_booleans_and_card_number_substrings_rejected) ... ok
+test_cleanup_failure_is_visible_in_report (test_agent.EvidenceTests.test_cleanup_failure_is_visible_in_report) ... ok
+test_collector_completion_and_unique_printings (test_agent.EvidenceTests.test_collector_completion_and_unique_printings) ... ok
+test_damage_evidence_survives_replanning (test_agent.EvidenceTests.test_damage_evidence_survives_replanning) ... ok
+test_disallowed_urls_and_credentials_rejected (test_agent.EvidenceTests.test_disallowed_urls_and_credentials_rejected) ... ok
+test_full_provider_contract_with_mock_responses (test_agent.EvidenceTests.test_full_provider_contract_with_mock_responses) ... ok
+test_generated_policy_cannot_override_budget_or_eligibility (test_agent.EvidenceTests.test_generated_policy_cannot_override_budget_or_eligibility) ... ok
+test_investor_optimization_beats_greedy_roi (test_agent.EvidenceTests.test_investor_optimization_beats_greedy_roi) ... ok
+test_llm_values_require_exact_evidence (test_agent.EvidenceTests.test_llm_values_require_exact_evidence) ... ok
+test_missing_configuration_stops_before_network (test_agent.EvidenceTests.test_missing_configuration_stops_before_network) ... ok
+test_no_investment_valuation_is_invented (test_agent.EvidenceTests.test_no_investment_valuation_is_invented) ... ok
+test_numeric_quote_cannot_justify_different_price (test_agent.EvidenceTests.test_numeric_quote_cannot_justify_different_price) ... ok
+test_primary_price_shipping_and_exact_match (test_agent.EvidenceTests.test_primary_price_shipping_and_exact_match) ... ok
+test_sandbox_failure_still_requests_cleanup (test_agent.EvidenceTests.test_sandbox_failure_still_requests_cleanup) ... ok
+test_secrets_removed_from_results (test_agent.EvidenceTests.test_secrets_removed_from_results) ... ok
+test_sold_is_not_a_buy_recommendation (test_agent.EvidenceTests.test_sold_is_not_a_buy_recommendation) ... ok
+test_unknown_shipping_not_assumed_free (test_agent.EvidenceTests.test_unknown_shipping_not_assumed_free) ... ok
+test_wrong_rarity_and_graded_bundle_excluded (test_agent.EvidenceTests.test_wrong_rarity_and_graded_bundle_excluded) ... ok
+test_daytona_cleanup_on_worker_failure (test_v2.NewWorkflowTests.test_daytona_cleanup_on_worker_failure) ... ok
+test_duplicate_image_blocked (test_v2.NewWorkflowTests.test_duplicate_image_blocked) ... ok
+test_exact_fixture_plan (test_v2.NewWorkflowTests.test_exact_fixture_plan) ... ok
+test_gemini_missing_key_fails_before_reading_images (test_v2.NewWorkflowTests.test_gemini_missing_key_fails_before_reading_images) ... ok
+test_hard_limit_types (test_v2.NewWorkflowTests.test_hard_limit_types) ... ok
+test_inventory_survives_restart (test_v2.NewWorkflowTests.test_inventory_survives_restart) ... ok
+test_market_idempotency_and_price_check (test_v2.NewWorkflowTests.test_market_idempotency_and_price_check) ... ok
+test_market_real_http_roundtrip (test_v2.NewWorkflowTests.test_market_real_http_roundtrip) ... ok
+test_multiple_quantity_same_printing (test_v2.NewWorkflowTests.test_multiple_quantity_same_printing) ... ok
+test_owned_target_excluded (test_v2.NewWorkflowTests.test_owned_target_excluded) ... ok
+test_price_change_replans (test_v2.NewWorkflowTests.test_price_change_replans) ... ok
+test_protected_copy_cannot_be_sold (test_v2.NewWorkflowTests.test_protected_copy_cannot_be_sold) ... ok
+test_psa_mismatch_and_incomplete (test_v2.NewWorkflowTests.test_psa_mismatch_and_incomplete) ... ok
+test_psa_preserves_leading_zero_and_match_is_not_authentication (test_v2.NewWorkflowTests.test_psa_preserves_leading_zero_and_match_is_not_authentication) ... ok
+test_raw_grade_blocked (test_v2.NewWorkflowTests.test_raw_grade_blocked) ... ok
+test_requested_nosana_model_not_silently_replaced (test_v2.NewWorkflowTests.test_requested_nosana_model_not_silently_replaced) ... ok
+test_reservation_duplicate_and_budget (test_v2.NewWorkflowTests.test_reservation_duplicate_and_budget) ... ok
+test_reservations_reduce_budget (test_v2.NewWorkflowTests.test_reservations_reduce_budget) ... ok
+test_selling_keeps_defects (test_v2.NewWorkflowTests.test_selling_keeps_defects) ... ok
+test_slab_cohort_never_matches_raw (test_v2.NewWorkflowTests.test_slab_cohort_never_matches_raw) ... ok
+test_uncertain_identity_not_confirmed (test_v2.NewWorkflowTests.test_uncertain_identity_not_confirmed) ... ok
+test_unknown_action_stays_reserved (test_v2.NewWorkflowTests.test_unknown_action_stays_reserved) ... ok
+test_unknown_shipping_and_sold_rejected (test_v2.NewWorkflowTests.test_unknown_shipping_and_sold_rejected) ... ok
+test_untrusted_model_suggestion_does_not_replace_facts (test_v2.NewWorkflowTests.test_untrusted_model_suggestion_does_not_replace_facts) ... ok
+test_wrong_variant_rejected (test_v2.NewWorkflowTests.test_wrong_variant_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 43 tests in 0.553s
+
+OK

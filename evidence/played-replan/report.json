@@ -1,0 +1,154 @@
+{
+  "app": "PokéScout autonomous research prototype",
+  "goal": "Re-analyze saved observations under updated user constraints",
+  "status": "reanalysis of recorded observations; not refreshed",
+  "request": {
+    "mode": "collector",
+    "budget_jpy": 10000,
+    "reserve_jpy": 1000,
+    "near_mint_only": false,
+    "targets": [
+      {
+        "name_ja": "ピカチュウ",
+        "number": "173/165",
+        "rarity": "AR",
+        "owned": false,
+        "key": "ピカチュウ 173/165 AR"
+      }
+    ],
+    "exit_shipping_jpy": 250,
+    "fee_rate": 0.1
+  },
+  "listings": [
+    {
+      "url": "https://jp.mercari.com/item/m86771047650",
+      "title": "【最安値】151 ピカチュウ AR 1枚 173/165",
+      "price": 2222.0,
+      "currency": "JPY",
+      "availability": "sold",
+      "shipping_jpy": 0,
+      "condition": "やや傷や汚れあり",
+      "observed_at": "2026-11-14T05:41:23.559191+00:00",
+      "method": "direct-public-html-jsonld",
+      "source_sha256": "3c0e86d12e92685efee5af384c5821c517943759b3d7c45f0b077c20c5b69f25",
+      "evidence": {
+        "price": "2222",
+        "availability": "SoldOut",
+        "condition": "やや傷や汚れあり",
+        "shipping": "送料込み(出品者負担)"
+      },
+      "target": "ピカチュウ 173/165 AR",
+      "reasons": [
+        "Sold"
+      ],
+      "eligible": false,
+      "authenticity": "not authenticated; condition is seller-claimed",
+      "total_jpy": 2222,
+      "break_even_jpy": 2747,
+      "scenario_net_jpy": null
+    },
+    {
+      "url": "https://jp.mercari.com/item/m37853448181",
+      "title": "ポケモンカード ピカチュウ AR SV2a 173/165",
+      "price": 2600.0,
+      "currency": "JPY",
+      "availability": "available",
+      "shipping_jpy": 0,
+      "condition": "やや傷や汚れあり",
+      "observed_at": "2026-11-14T05:41:31.147746+00:00",
+      "method": "direct-public-html-jsonld",
+      "source_sha256": "04c9b1823817ed598fb422ec0c1d2dd823e2649154e175fa825607ad2a65f1d1",
+      "evidence": {
+        "price": "2600",
+        "availability": "InStock",
+        "condition": "やや傷や汚れあり",
+        "shipping": "送料込み(出品者負担)"
+      },
+      "target": "ピカチュウ 173/165 AR",
+      "reasons": [],
+      "eligible": true,
+      "authenticity": "not authenticated; condition is seller-claimed",
+      "total_jpy": 2600,
+      "break_even_jpy": 3167,
+      "scenario_net_jpy": null
+    },
+    {
+      "url": "https://jp.mercari.com/item/m53548069551",
+      "title": "ピカチュウ AR SV2a ポケモンカード151 173/165",
+      "price": 2500.0,
+      "currency": "JPY",
+      "availability": "available",
+      "shipping_jpy": 0,
+      "condition": "目立った傷や汚れなし",
+      "observed_at": "2026-11-14T05:41:38.914684+00:00",
+      "method": "direct-public-html-jsonld",
+      "source_sha256": "9be5e9947b35caef59e3852b2839a0acd0a63421aedd963da9b247b809c1c5af",
+      "evidence": {
+        "price": "2500",
+        "availability": "InStock",
+        "condition": "目立った傷や汚れなし",
+        "shipping": "送料込み(出品者負担)"
+      },
+      "target": "ピカチュウ 173/165 AR",
+      "reasons": [],
+      "eligible": true,
+      "authenticity": "not authenticated; condition is seller-claimed",
+      "total_jpy": 2500,
+      "break_even_jpy": 3056,
+      "scenario_net_jpy": null
+    },
+    {
+      "url": "https://jp.mercari.com/item/m48331619457",
+      "title": "ピカチュウ AR SV2a ポケモンカード151 173/165",
+      "price": 2300.0,
+      "currency": "JPY",
+      "availability": "available",
+      "shipping_jpy": 0,
+      "condition": "光を当てると傷や四隅に欠けなど見られます。",
+      "observed_at": "2026-11-14T05:41:46.857562+00:00",
+      "method": "direct-public-html-jsonld",
+      "source_sha256": "f1ed499728e73ec5b086a0672d997ba901046c41c12fb28d8f4bb077a10b7454",
+      "evidence": {
+        "price": "2300",
+        "availability": "InStock",
+        "condition": "光を当てると傷や四隅に欠けなど見られます。",
+        "shipping": "送料込み(出品者負担)"
+      },
+      "target": "ピカチュウ 173/165 AR",
+      "reasons": [],
+      "eligible": true,
+      "authenticity": "not authenticated; condition is seller-claimed",
+      "total_jpy": 2300,
+      "break_even_jpy": 2834,
+      "scenario_net_jpy": null
+    }
+  ],
+  "plan": {
+    "urls": [
+      "https://jp.mercari.com/item/m48331619457"
+    ],
+    "cost_jpy": 2300,
+    "score": 1,
+    "cash_remaining_jpy": 7700,
+    "objective": "wishlist count, then lowest cost",
+    "scope": "best among retrieved, eligible listings; not the entire market",
+    "forecast": "No trained price forecast or guaranteed resale profit."
+  },
+  "completed_at": "2026-11-14T05:43:04.155953+00:00",
+  "sponsors": {
+    "Tavily": "not called",
+    "Nosana": "not called",
+    "CodeAF": "not called",
+    "Daytona": "not called"
+  },
+  "errors": [],
+  "analysis": null,
+  "trade_execution": "none",
+  "limitations": [
+    "Source pages may change or be cached by a provider.",
+    "Seller condition is not independent authentication.",
+    "Sold listing labels are not verified settlement records.",
+    "Investor exit prices are explicit assumptions, not predictions.",
+    "Marketplace access permission must be established for production use."
+  ]
+}

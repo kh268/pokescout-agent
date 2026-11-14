@@ -1,0 +1,11 @@
+{
+  "mode": "investor",
+  "budget_jpy": 30000,
+  "reserve_jpy": 5000,
+  "near_mint_only": true,
+  "fee_rate": 0.10,
+  "exit_shipping_jpy": 250,
+  "targets": [
+    {"name_ja": "ピカチュウ", "number": "173/165", "rarity": "AR"}
+  ]
+}

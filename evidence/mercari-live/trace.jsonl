@@ -1,0 +1,13 @@
+{"at": "2026-11-14T05:41:12.807340+00:00", "provider": "Reader", "event": "page.inspecting", "url": "https://jp.mercari.com/item/m86771047650"}
+{"at": "2026-11-14T05:41:23.562546+00:00", "provider": "Reader", "event": "page.observed", "url": "https://jp.mercari.com/item/m86771047650", "price": 2222.0, "availability": "sold", "eligible": false}
+{"at": "2026-11-14T05:41:23.563202+00:00", "provider": "Agent", "event": "search.revised-from-related-links", "queued": 14, "reason": "Current listing cannot satisfy the request"}
+{"at": "2026-11-14T05:41:24.563935+00:00", "provider": "Reader", "event": "page.inspecting", "url": "https://jp.mercari.com/item/m37853448181"}
+{"at": "2026-11-14T05:41:31.149583+00:00", "provider": "Reader", "event": "page.observed", "url": "https://jp.mercari.com/item/m37853448181", "price": 2600.0, "availability": "available", "eligible": false}
+{"at": "2026-11-14T05:41:31.149884+00:00", "provider": "Agent", "event": "search.revised-from-related-links", "queued": 16, "reason": "Current listing cannot satisfy the request"}
+{"at": "2026-11-14T05:41:32.150161+00:00", "provider": "Reader", "event": "page.inspecting", "url": "https://jp.mercari.com/item/m53548069551"}
+{"at": "2026-11-14T05:41:38.916151+00:00", "provider": "Reader", "event": "page.observed", "url": "https://jp.mercari.com/item/m53548069551", "price": 2500.0, "availability": "available", "eligible": false}
+{"at": "2026-11-14T05:41:38.916529+00:00", "provider": "Agent", "event": "search.revised-from-related-links", "queued": 16, "reason": "Current listing cannot satisfy the request"}
+{"at": "2026-11-14T05:41:39.916739+00:00", "provider": "Reader", "event": "page.inspecting", "url": "https://jp.mercari.com/item/m48331619457"}
+{"at": "2026-11-14T05:41:46.859430+00:00", "provider": "Reader", "event": "page.observed", "url": "https://jp.mercari.com/item/m48331619457", "price": 2300.0, "availability": "available", "eligible": false}
+{"at": "2026-11-14T05:41:46.859808+00:00", "provider": "Agent", "event": "search.revised-from-related-links", "queued": 16, "reason": "Current listing cannot satisfy the request"}
+{"at": "2026-11-14T05:41:46.859907+00:00", "provider": "Agent", "event": "local-reference-analysis.completed", "selected": [], "cost": 0}
