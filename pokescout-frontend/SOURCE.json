@@ -1,0 +1,8 @@
+{
+  "source_commit": "48915566a199cafa2e9ad4d716fb0628c5d5dc4f",
+  "design": "ivory-gold-coral",
+  "export": "portable-nextjs",
+  "backend": "synthetic demo; Python integration required",
+  "card_artwork_source": "TCGdex, source URLs in lib/card-catalog.json",
+  "date": "2026-11-14"
+}

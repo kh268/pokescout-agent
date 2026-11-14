@@ -11,6 +11,7 @@ from cards import validate_card
 from decisions import plan
 from fixture_market import TestMarket
 from image_agent import recognize_card
+from live_market_plan import research_and_plan
 from research import research_market
 from selling import draft
 
@@ -104,7 +105,7 @@ class Worker:
         with self.store.transaction() as db:
             job = self.store.get(db, owner, "job", job_id)
             self.store.put(db, owner, kind, key, result)
-            paths = {"candidate": "candidates", "research_report": "research-reports", "decision": "decisions",
+            paths = {"candidate": "candidates", "research_report": "research-reports", "decision": "decisions", "live_plan": "live-plans",
                      "sale_draft": "sale-drafts", "action_intent": "action-intents"}
             job["result"] = {"kind": kind, "id": key, "url": f"/api/v1/{paths[kind]}/{key}"}
             job["progress"] = {"message": "Result saved.", "completed_steps": 1, "total_steps": 1}
@@ -137,6 +138,12 @@ class Worker:
             self.finish(owner, job["job_id"], "research_report", report["run_id"], report)
         elif job["type"] == "decision":
             await self.make_decision(owner, job)
+        elif job["type"] == "tavily_plan":
+            with self.store.transaction() as db:
+                copies = self.store.rows(db, owner, "copy")
+            result = await asyncio.to_thread(research_and_plan, inputs["goal"], copies)
+            key = uid("live_plan")
+            self.finish(owner, job["job_id"], "live_plan", key, {"plan_id": key, **result})
         elif job["type"] == "sale_draft":
             with self.store.transaction() as db:
                 owned = self.store.get(db, owner, "copy", inputs["copy_id"])

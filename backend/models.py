@@ -107,7 +107,16 @@ class DecisionJob(Model):
     input: DecisionInput
 
 
-JobRequest = Annotated[IdentifyJob | ResearchJob | DecisionJob, Field(discriminator="type")]
+class TavilyPlanInput(Model):
+    goal: dict
+
+
+class TavilyPlanJob(Model):
+    type: Literal["tavily_plan"]
+    input: TavilyPlanInput
+
+
+JobRequest = Annotated[IdentifyJob | ResearchJob | DecisionJob | TavilyPlanJob, Field(discriminator="type")]
 
 
 class Answer(Model):
@@ -162,3 +171,9 @@ class ListingConfirmation(Model):
     observed_at: str = Field(min_length=1, max_length=80)
     confirmed: Literal[True]
     facts: ListingFacts
+
+
+class StructuredPlanInput(Model):
+    """User-entered observations; each nested card is checked by decisions.plan."""
+    goal: dict
+    listings: list[dict] = Field(max_length=16)

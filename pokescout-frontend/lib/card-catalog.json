@@ -1,0 +1,182 @@
+[
+  {
+    "id": "SV2a-205",
+    "nameJapanese": "ミュウex",
+    "nameEnglish": "Mew ex",
+    "imageLocal": "/cards/SV2a-205.webp",
+    "imageSource": "https://assets.tcgdex.net/ja/SV/SV2a/205/high.webp",
+    "sourceUrl": "https://api.tcgdex.net/v2/ja/cards/SV2a-205",
+    "set": {
+      "cardCount": {
+        "official": 165,
+        "total": 210
+      },
+      "id": "SV2a",
+      "name": "ポケモンカード151"
+    },
+    "rarity": "Special illustration rare",
+    "fetchedAt": "2026-11-14T04:17:00.116Z"
+  },
+  {
+    "id": "SV2a-201",
+    "nameJapanese": "リザードンex",
+    "nameEnglish": "Charizard ex",
+    "imageLocal": "/cards/SV2a-201.webp",
+    "imageSource": "https://assets.tcgdex.net/ja/SV/SV2a/201/high.webp",
+    "sourceUrl": "https://api.tcgdex.net/v2/ja/cards/SV2a-201",
+    "set": {
+      "cardCount": {
+        "official": 165,
+        "total": 210
+      },
+      "id": "SV2a",
+      "name": "ポケモンカード151"
+    },
+    "rarity": "Special illustration rare",
+    "fetchedAt": "2026-11-14T04:17:00.116Z"
+  },
+  {
+    "id": "SV2a-173",
+    "nameJapanese": "ピカチュウ",
+    "nameEnglish": "Pikachu",
+    "imageLocal": "/cards/SV2a-173.webp",
+    "imageSource": "https://assets.tcgdex.net/ja/SV/SV2a/173/high.webp",
+    "sourceUrl": "https://api.tcgdex.net/v2/ja/cards/SV2a-173",
+    "set": {
+      "cardCount": {
+        "official": 165,
+        "total": 210
+      },
+      "id": "SV2a",
+      "name": "ポケモンカード151"
+    },
+    "rarity": "Illustration rare",
+    "fetchedAt": "2026-11-14T04:17:00.147Z"
+  },
+  {
+    "id": "SV2a-166",
+    "nameJapanese": "フシギダネ",
+    "nameEnglish": "Bulbasaur",
+    "imageLocal": "/cards/SV2a-166.webp",
+    "imageSource": "https://assets.tcgdex.net/ja/SV/SV2a/166/high.webp",
+    "sourceUrl": "https://api.tcgdex.net/v2/ja/cards/SV2a-166",
+    "set": {
+      "cardCount": {
+        "official": 165,
+        "total": 210
+      },
+      "id": "SV2a",
+      "name": "ポケモンカード151"
+    },
+    "rarity": "Illustration rare",
+    "fetchedAt": "2026-11-14T04:17:00.091Z"
+  },
+  {
+    "id": "SV2a-170",
+    "nameJapanese": "ゼニガメ",
+    "nameEnglish": "Squirtle",
+    "imageLocal": "/cards/SV2a-170.webp",
+    "imageSource": "https://assets.tcgdex.net/ja/SV/SV2a/170/high.webp",
+    "sourceUrl": "https://api.tcgdex.net/v2/ja/cards/SV2a-170",
+    "set": {
+      "cardCount": {
+        "official": 165,
+        "total": 210
+      },
+      "id": "SV2a",
+      "name": "ポケモンカード151"
+    },
+    "rarity": "Illustration rare",
+    "fetchedAt": "2026-11-14T04:17:00.093Z"
+  },
+  {
+    "id": "SV2a-168",
+    "nameJapanese": "ヒトカゲ",
+    "nameEnglish": "Charmander",
+    "imageLocal": "/cards/SV2a-168.webp",
+    "imageSource": "https://assets.tcgdex.net/ja/SV/SV2a/168/high.webp",
+    "sourceUrl": "https://api.tcgdex.net/v2/ja/cards/SV2a-168",
+    "set": {
+      "cardCount": {
+        "official": 165,
+        "total": 210
+      },
+      "id": "SV2a",
+      "name": "ポケモンカード151"
+    },
+    "rarity": "Illustration rare",
+    "fetchedAt": "2026-11-14T04:17:00.101Z"
+  },
+  {
+    "id": "SV2a-203",
+    "nameJapanese": "フーディンex",
+    "nameEnglish": "Alakazam ex",
+    "imageLocal": "/cards/SV2a-203.webp",
+    "imageSource": "https://assets.tcgdex.net/ja/SV/SV2a/203/high.webp",
+    "sourceUrl": "https://api.tcgdex.net/v2/ja/cards/SV2a-203",
+    "set": {
+      "cardCount": {
+        "official": 165,
+        "total": 210
+      },
+      "id": "SV2a",
+      "name": "ポケモンカード151"
+    },
+    "rarity": "Special illustration rare",
+    "fetchedAt": "2026-11-14T04:17:00.147Z"
+  },
+  {
+    "id": "SV2a-204",
+    "nameJapanese": "サンダーex",
+    "nameEnglish": "Zapdos ex",
+    "imageLocal": "/cards/SV2a-204.webp",
+    "imageSource": "https://assets.tcgdex.net/ja/SV/SV2a/204/high.webp",
+    "sourceUrl": "https://api.tcgdex.net/v2/ja/cards/SV2a-204",
+    "set": {
+      "cardCount": {
+        "official": 165,
+        "total": 210
+      },
+      "id": "SV2a",
+      "name": "ポケモンカード151"
+    },
+    "rarity": "Special illustration rare",
+    "fetchedAt": "2026-11-14T04:17:00.097Z"
+  },
+  {
+    "id": "SV2a-200",
+    "nameJapanese": "フシギバナex",
+    "nameEnglish": "Venusaur ex",
+    "imageLocal": "/cards/SV2a-200.webp",
+    "imageSource": "https://assets.tcgdex.net/ja/SV/SV2a/200/high.webp",
+    "sourceUrl": "https://api.tcgdex.net/v2/ja/cards/SV2a-200",
+    "set": {
+      "cardCount": {
+        "official": 165,
+        "total": 210
+      },
+      "id": "SV2a",
+      "name": "ポケモンカード151"
+    },
+    "rarity": "Special illustration rare",
+    "fetchedAt": "2026-11-14T04:17:00.116Z"
+  },
+  {
+    "id": "SV2a-202",
+    "nameJapanese": "カメックスex",
+    "nameEnglish": "Blastoise ex",
+    "imageLocal": "/cards/SV2a-202.webp",
+    "imageSource": "https://assets.tcgdex.net/ja/SV/SV2a/202/high.webp",
+    "sourceUrl": "https://api.tcgdex.net/v2/ja/cards/SV2a-202",
+    "set": {
+      "cardCount": {
+        "official": 165,
+        "total": 210
+      },
+      "id": "SV2a",
+      "name": "ポケモンカード151"
+    },
+    "rarity": "Special illustration rare",
+    "fetchedAt": "2026-11-14T04:17:00.116Z"
+  }
+]

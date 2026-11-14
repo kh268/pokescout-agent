@@ -10,7 +10,7 @@ import time
 import uuid
 import warnings
 from contextlib import asynccontextmanager
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Annotated, Callable
 from urllib.parse import urlsplit
@@ -25,9 +25,10 @@ from starlette.exceptions import HTTPException
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from cards import validate_card
+from decisions import plan as structured_plan
 
 from .models import (Answers, Authorization, Card, ConfirmCopy, DecisionInput, DraftRequest,
-                     Empty, Goal, IntentRequest, JobRequest, Model, ListingConfirmation)
+                     Empty, Goal, IntentRequest, JobRequest, Model, ListingConfirmation, StructuredPlanInput)
 from .store import APIError, Store, digest, encoded, now, uid
 from .worker import Settings, TERMINAL, Worker, new_job, public_job
 
@@ -207,6 +208,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.get(PREFIX + "/capabilities")
     def capabilities(request: Request):
         return envelope(request, {"features": {"identify": settings.identify_enabled, "research": settings.research_enabled,
+            "tavily_plan": bool(os.getenv("TAVILY_API_KEY") and os.getenv("NOSANA_API_KEY")),
             "decision": True, "sale_draft": True, "fixture_execution": bool(settings.fixture_listings),
             "live_execution": False, "watch": False, "forecast": False,
             "activity_stream": bool(getattr(app.state, "activity_stream_enabled", False))},
@@ -278,6 +280,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 store.get(db, owner, "upload", inputs["upload_id"])
             elif kind == "research" and not settings.research_enabled:
                 raise APIError(409, "FEATURE_UNAVAILABLE", "Research service is not configured.")
+            elif kind == "tavily_plan" and not (os.getenv("TAVILY_API_KEY") and os.getenv("NOSANA_API_KEY")):
+                raise APIError(409, "FEATURE_UNAVAILABLE", "Set TAVILY_API_KEY and NOSANA_API_KEY on the Python server for live research.")
             elif kind == "decision":
                 # Include nullable defaults for stable resumption validation.
                 inputs = body.input.model_dump()
@@ -395,6 +399,67 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return envelope(request, {"items": [public_record(r) for r in page],
                                   "next_cursor": page[-1]["id"] if page and start + limit < len(rows) else None})
 
+    @app.post(PREFIX + "/structured-plans")
+    def calculate_structured(request: Request, body: StructuredPlanInput):
+        """Persist a Python calculation from traceable user-supplied offers."""
+        payload = body.model_dump()
+        goal, listings = payload["goal"], payload["listings"]
+        source_mode = goal.get("source_mode")
+        if source_mode not in {"user_supplied_observations", "synthetic_frontend_demo"}:
+            raise APIError(422, "INVALID_SOURCE_MODE", "Choose user_supplied_observations or synthetic_frontend_demo explicitly.")
+        stale_ids = set()
+        for row in listings:
+            source = row.get("source_url")
+            parsed = urlsplit(source) if isinstance(source, str) else None
+            if source_mode == "synthetic_frontend_demo":
+                if not parsed or parsed.scheme != "demo" or not parsed.netloc or row.get("source_mode") != "synthetic_frontend_demo":
+                    raise APIError(422, "SOURCE_REQUIRED", "Demo plans accept only explicitly synthetic demo offers.")
+            elif not parsed or parsed.scheme != "https" or not parsed.hostname or parsed.username or parsed.password or parsed.fragment:
+                raise APIError(422, "SOURCE_REQUIRED", "Each offer needs an HTTPS source URL.")
+            stamp = row.get("observed_at")
+            try:
+                observed = datetime.fromisoformat(stamp.replace("Z", "+00:00"))
+            except (AttributeError, ValueError):
+                raise APIError(422, "TIMESTAMP_REQUIRED", "Each offer needs an ISO observation timestamp.") from None
+            if observed.tzinfo is None or (source_mode == "user_supplied_observations" and row.get("source_mode", "user_supplied") != "user_supplied"):
+                raise APIError(422, "SOURCE_REQUIRED", "Timestamp needs a timezone and source_mode must match the workspace.")
+            if datetime.now(timezone.utc) - observed > timedelta(hours=24) or observed - datetime.now(timezone.utc) > timedelta(minutes=5):
+                stale_ids.add(row.get("id"))
+        def save(db, owner):
+            copies = store.rows(db, owner, "copy")
+            try:
+                # Keep original source facts in the saved record; only the planning
+                # view marks old or future-dated offers unavailable.
+                planning_rows = [{**row, "availability": "stale"} if row.get("id") in stale_ids else row
+                                 for row in listings]
+                calculation = structured_plan(goal, planning_rows, copies)
+                for checked in calculation["checked"]:
+                    if checked["id"] in stale_ids:
+                        checked["reasons"].append("STALE_OBSERVATION")
+                        checked["eligible"] = False
+            except (ValueError, KeyError, TypeError) as exc:
+                raise APIError(422, "INVALID_INPUT", str(exc)) from None
+            key = uid("structured_plan")
+            result = {"plan_id": key, "version": 1, "created_at": now(), "mode": "synthetic_demo" if source_mode == "synthetic_frontend_demo" else "user_supplied",
+                      "currency": "JPY", "goal": goal, "listings": listings, "plan": calculation,
+                      "disclosure": "Synthetic demo offers; no market call or transaction." if source_mode == "synthetic_frontend_demo" else
+                                    "User-entered observations; sources and availability were not independently verified. No transaction."}
+            store.put(db, owner, "structured_plan", key, result)
+            return result
+        return mutate(request, payload, 201, save)
+
+    @app.get(PREFIX + "/structured-plans")
+    def structured_plans(request: Request):
+        with store.transaction() as db:
+            rows = store.rows(db, request.state.owner, "structured_plan")
+        return envelope(request, {"items": [public_record(r) for r in rows[-30:][::-1]], "next_cursor": None})
+
+    @app.get(PREFIX + "/structured-plans/{key}")
+    def structured_plan_record(request: Request, key: str):
+        with store.transaction() as db:
+            result = store.get(db, request.state.owner, "structured_plan", key)
+        return envelope(request, public_record(result))
+
     # Separate route functions preserve OpenAPI parameter/path consistency.
     def read_record(kind: str):
         def read(request: Request, key: str):
@@ -402,7 +467,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 data = public_record(store.get(db, request.state.owner, kind, key))
             return envelope(request, data)
         return read
-    for path, kind in {"uploads": "upload", "candidates": "candidate", "copies": "copy",
+    for path, kind in {"uploads": "upload", "candidates": "candidate", "copies": "copy", "live-plans": "live_plan",
                        "research-reports": "research_report", "decisions": "decision",
                        "sale-drafts": "sale_draft", "action-intents": "action_intent", "evidence": "evidence"}.items():
         app.add_api_route(PREFIX + f"/{path}/{{key}}", read_record(kind), methods=["GET"], name="get_" + kind)
