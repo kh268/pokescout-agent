@@ -1,4 +1,4 @@
-# PokéScout Agent — v0.2.0
+# PokéScout Agent
 
 A Python agent for physical Pokémon card collection, marketplace research and budget decisions. This release updates the earlier ZIP to the current architecture: models extract evidence; Python owns purchase calculations; Playwright is isolated behind an explicit test-execution adapter.
 
