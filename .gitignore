@@ -1,4 +1,5 @@
 .env
+.daytona_sandbox_id
 .venv/
 __pycache__/
 *.pyc
