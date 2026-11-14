@@ -110,6 +110,55 @@ sample. Start with the same clean image, then test one real photo and one image
 with an unreadable number. Preserve nulls and confirmation requirements; do not
 claim an accuracy percentage from these few examples.
 
+## Ten-card live evaluation — 2026-11-14
+
+[Full recorded results](../evidence/image-recognition/public-catalog-10-cards.json)
+were produced on commit `cba2dbb` using the new agent and exactly 10 live calls.
+All 9 successful responses reported `gemini-3.5-flash-lite`. No expected card
+identity was supplied in the prompt, and no failed sample was retried. Requests
+were started at least 15 seconds apart. The temporary credential file was deleted.
+
+| Sample | Result | Seconds |
+| --- | --- | ---: |
+| Charizard ex, SV2a 201/165 SAR | Strict match | 3.43 |
+| Charmander, SV2a 168/165 AR | Provider unavailable; no identity output | 11.56 |
+| Pikachu, SV2a 173/165 AR | Set null; candidate incomplete | 9.43 |
+| Bulbasaur, SV2a 166/165 AR | Strict match | 19.60 |
+| Squirtle, SV2a 170/165 AR | Strict match | 14.82 |
+| Venusaur ex, SV2a 200/165 SAR | English set alias plus inferred-set uncertainty; candidate incomplete | 7.34 |
+| Erika's Invitation, SV2a 206/165 SAR | Strict match | 10.74 |
+| Charizard ex, SV3 134/108 SAR | Translated set and expanded rarity label; canonicalization needed | 36.55 |
+| Charizard ex, SV4a 349/190 SAR | Strict match | 12.40 |
+| Charizard ex, SV4a 331/190 SSR | Strict match | 18.02 |
+
+Summary: 9/10 calls returned validated JSON. All 9 returned the correct name,
+collector number, language, raw presentation, and null grading fields. Six met
+all strict comparison rules. Two used translated/expanded aliases and one
+omitted the set. Median successful call duration was 12.40 seconds, with a
+3.43–36.55 second range. These are agent-call durations, unlike the earlier
+single-sample measurement which included CLI startup.
+
+The strict evaluator accepts the catalog set code or original Japanese set name
+and the printed rarity abbreviation. It applies NFKC, whitespace removal and
+case-folding; it does not automatically translate aliases. For example,
+`Ruler of the Black Flame` and `Special Illustration Rare (SAR)` fail that exact
+contract even though manual review identifies translation/format differences,
+not a different card. Preserve this distinction rather than reporting 6/10 as a
+general model accuracy score. `candidate_complete` checks presence and reported
+uncertainty; it does not prove a canonical catalog match.
+
+The TCGdex records for the three SV3/SV4a samples did not include rarity. Their
+printed SAR/SSR labels were inspected directly before model calls, and the
+report records this separate ground-truth source. Catalog names, numbers, set
+codes, source URLs, image hashes and raw returned fields remain inspectable.
+
+All samples are clean Japanese catalog images across three sets (four AR, five
+SAR, one SSR), including four Charizard printings and one Trainer card. This is
+a selected, small smoke set, not representative real-photo evaluation. No blur,
+glare, slab, rotated-image or authenticity result is claimed. The next needed
+integration step is explicit catalog canonicalization while preserving original
+model text; an unknown set must remain unresolved until checked or confirmed.
+
 ## Team ownership
 
 Branch `feat/image-recognition-agent` owns `cards.py`, `image_agent.py`, the
