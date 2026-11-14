@@ -1,0 +1,13 @@
+{
+  "confirmed_target": {"name_ja": "ミュウツーV", "number": "273/S-P", "language": "ja"},
+  "currency": "JPY",
+  "raw_only": true,
+  "price_basis": "item_price",
+  "source_limits": {
+    "allowed_domains": ["jp.mercari.com", "item.fril.jp"],
+    "max_searches": 3,
+    "max_inspections": 4,
+    "results_per_search": 5,
+    "timeout_seconds": 120
+  }
+}

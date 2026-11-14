@@ -34,9 +34,9 @@ report = await research_market(request)
 
 `RESEARCH_AGENT_URL` defaults to `http://127.0.0.1:18081`. The async adapter uses
 only Python's standard library. The main application does not need AgentField
-or Gemini packages just to call the service. This commit reserves the contract;
-the expanded endpoint is being implemented/live-tested next. Existing
-`/reasoners/research` is the earlier, smaller experiment and is not this contract.
+or Gemini packages just to call the service. The expanded endpoint is implemented
+in `experiments/sc/market_research.py`. Existing `/reasoners/research` is the
+earlier, smaller experiment and is not this contract.
 
 ## AgentField invocation
 
@@ -44,7 +44,8 @@ Direct: `POST http://localhost:18081/reasoners/research_market`
 
 Control plane: `POST http://localhost:18080/api/v1/execute/pokescout-research.research_market`
 
-Both accept `{"input": {"request": <ResearchRequest>}}`.
+The direct endpoint accepts `{"request": <ResearchRequest>}`.
+The control plane accepts `{"input": {"request": <ResearchRequest>}}`.
 Start instructions and verification evidence will be maintained in
 `experiments/sc/RESEARCH.md` after the live test.
 

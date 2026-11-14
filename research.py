@@ -117,7 +117,8 @@ async def research_market(request: ResearchRequest) -> ResearchReport:
     timeout = request.get("source_limits", {}).get("timeout_seconds", 120) + 15
 
     def invoke() -> ResearchReport:
-        payload = json.dumps({"input": {"request": request}}).encode("utf-8")
+        # Direct node endpoints take function arguments; only the control plane uses input.
+        payload = json.dumps({"request": request}).encode("utf-8")
         call = urllib.request.Request(
             origin + "/reasoners/research_market", data=payload,
             headers={"Content-Type": "application/json"}, method="POST",

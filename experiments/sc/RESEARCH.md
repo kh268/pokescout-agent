@@ -1,5 +1,77 @@
 # Research agent experiment
 
+## Current shared-contract endpoint
+
+The expanded implementation is `market_research.py`, implementing the root
+`research.py` contract: `research_market(ResearchRequest) -> ResearchReport`.
+Run it with `.\.venv\Scripts\python.exe -X utf8 market_research.py`; the example
+request is in `market-request.json`. To serve it, use `start_research.ps1`.
+
+Call `POST http://localhost:18081/reasoners/research_market` with
+`{"request": <ResearchRequest>}`. Through AgentField's control plane, call
+`POST http://localhost:18080/api/v1/execute/pokescout-research.research_market`
+with `{"input": {"request": <ResearchRequest>}}`. These body shapes differ.
+The root async `research.research_market()` client handles the direct-node format.
+
+The research agent uses Gemini for initial planning, refinement informed by
+actual search results, source prioritization, extraction and cited synthesis.
+Tavily search is restricted to Mercari/Rakuma, with returned listing URLs checked
+again. Public primary-product HTML inspection is attempted first. Where that
+fails, Tavily extraction is attempted and explicitly remains unverified.
+Exact quotes support extracted fields; Python qualifies and ranks observations.
+The main `full_run()` pipeline and providers remain unchanged.
+
+Default limits: three searches, four unique inspected sources, five results per
+search, 120 seconds. Hard caps: four searches, six inspected sources, eight
+results per search and 180 seconds. Each inspected source may have one direct
+request and one extraction fallback. Bounds apply to attempted searches/unique
+inspection sources, not only successful calls. The timeout covers the research
+body; SDK workflow bookkeeping may add latency outside that body.
+
+Reports include all listings, comparable offers, the lowest qualifying observed
+price or null, cited findings, uncertainty, actual coverage, failures and next
+steps. Ranking uses the requested item/delivered-price basis, JPY, exact target,
+raw/bundle rules and optional condition filter. Unknown stock does not qualify;
+unknown shipping excludes delivered-price comparisons. No budget, collection,
+buy/sell or trading decisions are performed. `verified_listing` requires direct
+primary Product data establishing price/currency and stock; a search or Tavily
+extract alone never gets that label. Live price observation is not authenticity
+verification, guaranteed checkout or a claim to have searched the whole market.
+
+Every run saves `logs/market-*.jsonl` and a matching `.report.json`. All failures
+and partial observations survive a timeout or synthesis failure. The legacy
+`research_agent.py` and its old `/reasoners/research` endpoint are retained only
+for comparison; the sections below describe that earlier experiment.
+
+Migration: root `research.py` is already the callable client/shared contract.
+Keep the service in the experiment until integration is agreed. The service
+reuses `research_agent.py` for AgentField/Gemini/logging and the main `core.py`'s
+pure primary-Product parser; neither the provider pipeline nor decision logic is
+replaced. On promotion, move the service and shared runtime together or move the
+runtime helpers into a small common module. Do not copy the earlier prototype's
+`research()` report shape into the decision agent.
+
+### Expanded-contract verification (2026-11-14)
+
+- All 11 experiment tests passed; dependency check passed.
+- Root `research.research_market()` completed a real HTTP call to the node.
+- Control-plane execution `exec_20261114_074810_tsol6smz` returned HTTP 200 and
+  `succeeded`; the research report itself correctly says `partial`.
+- That run used two searches, retained six marketplace listings, and attempted
+  four inspections. No source established a qualifying verified offer, so the
+  lowest qualifying observed price is null. Direct primary-Product parsing
+  failed on these pages; Tavily extraction remained explicitly unverified.
+- Evidence: `logs/market-control-plane-live.json` and
+  `logs/market-20261114T074810538438Z.jsonl` / `.report.json`.
+- Main-project tests, with `PYTHONUTF8=1`: 41/43 passed. The two errors are Windows
+  SQLite temporary-file cleanup (`test_market_idempotency_and_price_check` and
+  `test_market_real_http_roundtrip`). No main pipeline/parser/decision code was
+  changed to work around them. Details: `logs/main-tests-utf8.txt`.
+- New contract tests cover actual node request serialization, schema validation,
+  query/inspection caps, fabricated field rejection, exact number boundaries,
+  marketplace URL restrictions, stock uncertainty, Python rankings, shipping
+  exclusions, and retaining direct observations when synthesis fails.
+
 This is the market research component from the proposed PokeScout architecture.
 It accepts an already identified card. Upload normalization, collection storage,
 prediction, trading and the main agent belong to later work.
