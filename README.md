@@ -2,6 +2,8 @@
 
 A Python agent for physical Pokémon card collection, marketplace research and budget decisions. This release updates the earlier ZIP to the current architecture: models extract evidence; Python owns purchase calculations; Playwright is isolated behind an explicit test-execution adapter.
 
+The release CLI modules remain at the repository root to preserve their existing imports. New backend-facing providers and a reusable Daytona browser worker are documented in [Provider Setup](docs/Provider_Setup.md). `RELEASE.json` and `MANIFEST.sha256` describe the earlier v0.2 release snapshot.
+
 **Start with the reproducible local demo. It needs no API keys and performs no real transactions.**
 
 ```bash
@@ -30,6 +32,20 @@ The demo stores a synthetic owned card, compares six synthetic offers, selects A
 
 Read `docs/PokeScout_Product_Plan.md` for the full design. It is a roadmap, not a claim that all 20 sections are implemented. This README is the capability reference for this release.
 
+## Backend provider and Daytona setup
+
+The current CLI's image-recognition path uses `image_agent.py` and defaults to `gemini-3.5-flash-lite`. The separate `pokescout_agents/` package provides typed Gemini, Nosana, Tavily and decision interfaces for backend integration; its configured Gemini model is `gemini-3.8-flash`. Both models remain configurable, with no automatic provider fallback. The browser runtime lives in `daytona_worker/` and is uploaded by `setup_daytona.py`.
+
+On PowerShell, fill in the ignored `.env` file using `.env.example`, then run:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pokescout_agents.doctor
+.\.venv\Scripts\python.exe setup_daytona.py setup
+```
+
+Authenticated model checks and small smoke calls passed for the configured Nosana Qwen and Gemini 3.8 models. Tavily's client is mock-tested; no live Search or Extract call is claimed. The Daytona worker passed its local Chromium self-test, while outbound navigation to `example.com` failed under the current sandbox network policy. See [Provider Setup](docs/Provider_Setup.md) for the backend API, tests and limits. These additions do not submit marketplace transactions.
+
 ## Installation
 
 The core CLI, persistence, structured planner, template selling and original HTTP research adapters use the Python standard library. Use Python 3.10 or newer.
@@ -51,7 +67,7 @@ python -m playwright install --with-deps chromium
 
 Use the browser version installed by Playwright. If deliberately testing an existing local Chromium, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE` to its absolute path. That is an explicit compatibility choice, not a guaranteed substitute. This build environment has a Chromium process/socket restriction; attempts were recorded as failed rather than reported as successful execution.
 
-`.env.example` documents configuration names. The application does **not** load `.env` automatically. Export variables in your shell, without committing credentials.
+`.env.example` documents configuration names. The existing CLI does **not** load `.env` automatically; export variables in your shell. The new `pokescout_agents/` package and `setup_daytona.py` load the ignored `.env` file. Never commit credentials.
 
 ## 1. Identify and register an owned card
 
