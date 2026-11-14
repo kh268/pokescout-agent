@@ -4,7 +4,8 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from cards import identify, compare_psa
+from cards import compare_psa
+from image_agent import recognize_card
 from collection import Collection
 from decisions import plan
 from selling import draft
@@ -24,7 +25,7 @@ def fresh_directory(path):
 def main(argv):
     parser=argparse.ArgumentParser(description='PokéScout v0.2 collection and test execution')
     sub=parser.add_subparsers(dest='cmd',required=True)
-    p=sub.add_parser('identify');p.add_argument('images',nargs='+');p.add_argument('--out',required=True)
+    p=sub.add_parser('identify');p.add_argument('images',nargs='+');p.add_argument('--out',required=True);p.add_argument('--model',help='Explicit Gemini model; overrides GEMINI_MODEL')
     p=sub.add_parser('add');p.add_argument('--record',required=True);p.add_argument('--confirm-owned',action='store_true',required=True)
     p.add_argument('--allow-sale',action='store_true');p.add_argument('--cost-jpy',type=int)
     p.add_argument('--db',default='data/collection.sqlite3')
@@ -38,7 +39,10 @@ def main(argv):
     p.add_argument('--simulate-lost-response',action='store_true')
     p=sub.add_parser('browser-demo');p.add_argument('--out',required=True);p.add_argument('--daytona',action='store_true')
     args=parser.parse_args(argv)
-    if args.cmd=='identify':output(identify(args.images),args.out);return 0
+    if args.cmd=='identify':
+        result=recognize_card(args.images,model=args.model)
+        output(result,args.out)
+        return 0 if result['ok'] else 2
     if args.cmd=='psa-compare':
         v=load(args.record);output(compare_psa(v.get('card',v),load(args.registry_record)));return 0
     if args.cmd in ('demo','browser-demo'):return demo(args)

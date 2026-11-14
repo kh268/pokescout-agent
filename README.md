@@ -17,7 +17,7 @@ The demo stores a synthetic owned card, compares six synthetic offers, selects A
 | --- | --- | --- |
 | Raw-card research | Original `inspect`, `run`, `replan` commands retained | Historical Mercari evidence bundled; no new live marketplace retrieval claimed for this release |
 | Deterministic research decisions | `run` now uses host Python directly | Local tests and mocked provider contract; no generated-code policy in the default path |
-| Image intake | Gemini adapter, image validation, JSON schema, candidate record | API key required; no live Gemini call verified here |
+| Image intake | Gemini image adapter plus callable agent, structured failures and confirmation status | One clean public sample passed on the baseline adapter; new agent regression tests are offline. See [image-agent contract](docs/image-recognition.md) |
 | PSA fields | Label schema and comparison with a supplied registry record | Local validation tested; no authenticated PSA API lookup or physical authentication |
 | Collection | SQLite persistence, sell protection, optional cost basis, duplicate-image check | Tested across database reopen |
 | Structured planner | Exact identity/cohort, quantities, owned copies, total costs, reserve and explicit reservations | Tested on supplied structured observations and synthetic fixtures |
@@ -57,9 +57,11 @@ Use the browser version installed by Playwright. If deliberately testing an exis
 
 ```bash
 export GEMINI_API_KEY='your-key'
-export GEMINI_MODEL='gemini-3.8-flash'
+export GEMINI_MODEL='gemini-3.5-flash-lite'
 python pokescout.py identify ./front.jpg ./back.jpg --out runs/card-candidate.json
 ```
+
+For Python integration, model selection, structured failures and the recorded live sample, see [the image-recognition agent contract](docs/image-recognition.md). The default model is `gemini-3.5-flash-lite`; an explicit `--model` or `GEMINI_MODEL` overrides it. There is no automatic model fallback.
 
 Review the returned `card` object. Correct uncertain fields using the actual image or verified metadata. Clear the corresponding `uncertainties` only when they have been resolved. Required confirmed fields are name, set, number, language, variant and presentation. Use `raw` or `slabbed`; raw cards cannot have a slab grade or certificate.
 
@@ -197,7 +199,7 @@ New tests cover exact identity and cohort rejection, unknown shipping, quantitie
 - No automatic live purchases, bids, messages, seller contact or marketplace listing publication.
 - No automatic PSA database lookup, physical-authenticity classifier or raw-card grading.
 - No continuously running watch service or validated future-price predictor.
-- Gemini, Nosana, Tavily and Daytona live calls were not run for this release because credentials were unavailable.
+- The original release did not live-test providers. A later Gemini 3.5 Flash-Lite call identified one public raw-card sample; this does not validate real-photo accuracy, PSA recognition or other providers. See [recorded evidence](evidence/image-recognition/gemini-flash-lite-public-sample.json).
 - The local browser end-to-end path was blocked by this host's Chromium runtime restrictions; the HTTP fixture and ledger are tested separately.
 - The new structured planner and original research extractor still have distinct schemas; connecting them without losing evidence is remaining work.
 - The full product plan includes features beyond this release. Do not pitch them as completed.

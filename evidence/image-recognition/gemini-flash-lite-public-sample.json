@@ -1,0 +1,52 @@
+{
+  "started_at": "2026-11-14T07:29:10.974345+00:00",
+  "requested_model": "gemini-3.5-flash-lite",
+  "code_path": "pokescout.py identify -> cards.identify",
+  "image_url": "https://assets.tcgdex.net/ja/SV/SV2a/201/high.png",
+  "sample": "Japanese Charizard ex SAR SV2a 201/165; raw public catalog image",
+  "expected_identity_supplied_to_model": false,
+  "exit_code": 0,
+  "result": {
+    "card": {
+      "name": "リザードンex",
+      "set": "sv2a",
+      "number": "201/165",
+      "language": "Japanese",
+      "variant": "SAR",
+      "year": "2023",
+      "brand": "Pokémon",
+      "presentation": "raw",
+      "grader": null,
+      "grade": null,
+      "grade_text": null,
+      "cert_number": null,
+      "qualifiers": [],
+      "defects": [],
+      "uncertainties": []
+    },
+    "image_sha256": [
+      "ed354c8076375242972afa7a485a59114cef96525e5d732e01ce09d66b8968b6"
+    ],
+    "provider": "Gemini",
+    "configured_model": "gemini-3.5-flash-lite",
+    "returned_model": "gemini-3.5-flash-lite",
+    "request_id": "yQ34arGjCfiPrfcPu6eg6QY",
+    "status": "candidate; user confirmation required",
+    "physical_authenticity": "not established"
+  },
+  "checks": {
+    "name": true,
+    "set": true,
+    "number": true,
+    "language": true,
+    "variant": true,
+    "presentation": true,
+    "no_invented_grading": true
+  },
+  "identity_checks_passed": true,
+  "unresolved_uncertainties": [],
+  "elapsed_seconds": 4.26,
+  "temporary_key_deleted": true,
+  "tested_commit": "cd1e6c97821e2ca7e7bd64931235bc1a2f57e6d4",
+  "scope_note": "Live smoke test of the existing cards.identify adapter before the image_agent wrapper was added. One clean public catalog image, not a real-photo accuracy evaluation."
+}
