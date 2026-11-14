@@ -30,6 +30,7 @@ class Settings:
     research: Callable[..., Awaitable[dict]] = research_market
     job_timeout: float = 180
     allowed_origins: list[str] = field(default_factory=list)
+    main_agent: Callable | None = None
 
 
 def new_job(owner: str, kind: str, inputs: dict) -> dict:
@@ -130,6 +131,8 @@ class Worker:
         elif job["type"] == "research":
             report = await self.run_research(job, inputs["request"])
             self.save_report(owner, report)
+            if report.get("status") == "failed":
+                raise APIError(502, "RESEARCH_FAILED", "Research failed; its evidence report was retained.")
             self.finish(owner, job["job_id"], "research_report", report["run_id"], report)
         elif job["type"] == "decision":
             await self.make_decision(owner, job)
@@ -203,6 +206,25 @@ class Worker:
                     current = self.store.get(db, owner, "job", job["job_id"])
                     current["_input"]["research_run_ids"].append(report["run_id"])
                     self.store.put(db, owner, "job", job["job_id"], current)
+        if not self.settings.fixture_listings:
+            from .main_agent import decide
+            with self.store.transaction() as db:
+                reservations = db.execute("SELECT COALESCE(SUM(total),0) FROM api_reservations WHERE owner=? AND state='reserved'", (owner,)).fetchone()[0]
+            if self.settings.main_agent:
+                decision = await asyncio.to_thread(self.settings.main_agent, goal, copies, reports, reservations)
+            else:
+                from agent_store import AgentError
+                from .store import digest
+                try:
+                    decision = await asyncio.to_thread(decide, goal, copies, reports, reservations,
+                        data_dir=self.store.root / "main-agent" / digest(owner), job_id=job["job_id"])
+                except AgentError as exc:
+                    raise APIError(502, exc.code, str(exc), retryable=exc.retryable) from None
+            decision["goal_snapshot"] = goal
+            decision["collection_snapshot"] = copies
+            decision["source_mode"] = "research_reports"
+            self.finish(owner, job["job_id"], "decision", decision["decision_id"], decision)
+            return
         # The current research schema does not establish complete set/variant identity
         # or purchase fees. Keep those observations as excluded evidence, not guessed offers.
         listings = copy.deepcopy(self.settings.fixture_listings)
