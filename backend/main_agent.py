@@ -1,9 +1,8 @@
-"""API-owned adapter to the teammate-owned main decision implementation."""
-import asyncio
+"""API-owned adapter to the merged, persistent Pipeline implementation."""
 import uuid
 from pathlib import Path
 
-from main_agent import MainAgent
+from orchestrator import Pipeline
 from agent_store import AgentError, digest
 
 
@@ -13,45 +12,57 @@ class MainAgentNeedsInput(Exception):
 
 
 def decide(goal: dict, copies: list[dict], reports: list[dict], reservations: int,
-           *, data_dir: Path, job_id: str, facts: list[dict] = ()) -> dict:
-    """Run the real main agent, retaining its checkpoints and report provenance."""
-    class ScopedMainAgent(MainAgent):
-        def _snapshot(self, *, fixture=False):
+           *, data_dir: Path, job_id: str, facts=(), on_activity=None) -> dict:
+    """Run the merged pipeline using API-authorized evidence and collection."""
+    class ScopedPipeline(Pipeline):
+        def _collection_snapshot(self, fixture):
             snapshot = {"schema_version": "1.0", "snapshot_id": "collection-" + uuid.uuid4().hex,
                         "copies": copies, "confirmed_cash_jpy": None,
                         "active_reservations_jpy": reservations}
-            return self.store.artifact("snapshots", snapshot["snapshot_id"], snapshot)
+            self._artifact("snapshots", snapshot["snapshot_id"], snapshot)
+            return snapshot
 
-    agent = ScopedMainAgent(data_dir)
-    # API session ownership remains authoritative; do not read another user's
-    # collection merely because the main agent supports a local single user CLI.
-    agent.store.collection.list = lambda: copies
+        def _update(self, job, checkpoint, state, stage, message, completed, **kwargs):
+            super()._update(job, checkpoint, state, stage, message, completed, **kwargs)
+            if on_activity:
+                try:
+                    on_activity(state, stage)
+                except Exception:
+                    import logging
+                    logging.getLogger(__name__).warning("Pipeline activity publication failed.")
+
+    for report in reports:
+        target = report.get("request", {}).get("confirmed_target", {})
+        if not any(target.get("number") == item["card"]["number"] and
+                   target.get("name_ja") == item["card"]["name"] for item in goal["targets"]):
+            raise AgentError("INVALID_INPUT", "Research report does not match a confirmed target.")
+    pipeline = ScopedPipeline(data_dir)
+    pipeline.store.collection.list = lambda: copies
     try:
-        run_ids = [agent.import_research(report, source_mode="live") for report in reports]
-        for fact in facts:
-            if fact["run_id"] in run_ids:
-                values = {key: fact[key] for key in ("card", "quantity", "purchase_fee_jpy", "condition_record", "registry_status")}
-                agent.confirm_listing(fact["run_id"], fact["listing_id"], fact["observed_at"], values, confirmed=True)
-        # A changed goal after frontend clarification gets a new child attempt;
-        # the outer API job and its activity timeline keep the same identity.
-        job = agent.create_job("decision", {"goal": goal, "research_run_ids": run_ids}, key=job_id + ":" + digest(goal)[:32])
-        done = asyncio.run(agent.run_job(job["job_id"]))
+        run_ids = {report["run_id"] for report in reports}
+        sidecar = {fact["fact_id"]: {key: fact[key] for key in
+                   ("card", "quantity", "purchase_fee_jpy", "condition_record", "registry_status")}
+                   for fact in facts if fact["run_id"] in run_ids}
+        if not reports and goal["intent"] != "sell":
+            raise AgentError("RESEARCH_UNAVAILABLE", "No research report is available for this decision.")
+        done = pipeline.start({"goal": goal, "reports": reports, "facts": sidecar},
+                              idempotency_key=job_id + ":" + digest(goal)[:32])
         if done["state"] == "awaiting_input":
             questions = done["questions"]
             for question in questions:
-                field = question["field"]
-                if field.startswith("targets."):
-                    question["field"] = "target_card." + field.split(".")[1]
-                elif field == "copy_ids":
+                if question["field"].startswith("targets."):
+                    question["field"] = "target_card." + question["field"].split(".")[1]
+                elif question["field"] == "copy_ids":
                     question["field"] = "copy_id"
-            # The API owns waiting/resumption; release the child active-job slot.
-            agent.cancel(job["job_id"], revision=done["revision"], key=job_id + ":cancel:" + digest(goal)[:32])
-            asyncio.run(agent.run_job(job["job_id"]))
+            with pipeline.store.transaction():
+                child = pipeline.get(done["job_id"])
+                child.update(state="cancelled", stage="finished", questions=[])
+                pipeline.store.put_job(child)
             raise MainAgentNeedsInput(questions)
         if done["state"] != "succeeded":
             error = done.get("error") or {}
-            raise AgentError(error.get("code", "MAIN_AGENT_INCOMPLETE"),
-                             error.get("message", "Main agent did not produce a decision."))
-        return agent.store.read("decisions", done["result"]["id"])
+            raise AgentError(error.get("code", "PIPELINE_INCOMPLETE"),
+                             error.get("message", "Pipeline did not produce a decision."))
+        return pipeline.result(done["job_id"])
     finally:
-        agent.close()
+        pipeline.close()

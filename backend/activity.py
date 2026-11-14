@@ -2,11 +2,12 @@
 import json
 import os
 import time
+import uuid
 
 from fastapi import HTTPException
 
 from activity import DEFAULT_PUBLISH_URL
-from activity_server import ActivityStore, activity_router
+from activity_server import ActivityStore, Event, PublicData, activity_router, now
 
 
 def attach_activity(app, store, worker) -> None:
@@ -32,3 +33,16 @@ def attach_activity(app, store, worker) -> None:
     worker.activity_context = lambda job: journal.issue_context(
         job["job_id"], "pokescout-research", ["research.*"], parent_span_id=job["job_id"],
         publish_url=os.getenv("ACTIVITY_PUBLISH_URL", DEFAULT_PUBLISH_URL))
+
+    def pipeline_activity(job):
+        context = journal.issue_context(job["job_id"], "pokescout-main", ["pipeline.*"])
+        def publish(state, stage):
+            safe_stage = stage if stage in {"identify", "clarify", "research", "decision", "draft", "execute", "finished"} else "workflow"
+            event_type = "step.failed" if state == "failed" else "step.completed" if state == "succeeded" else "step.progress"
+            journal.append(context.publisher_token, Event(schema_version="1.0", event_id=str(uuid.uuid4()),
+                job_id=job["job_id"], type=event_type, operation="pipeline." + safe_stage,
+                span_id=job["job_id"] + "-pipeline", parent_span_id=job["job_id"], attempt=1,
+                occurred_at=now(), level="error" if state == "failed" else "info",
+                message="Main pipeline: " + safe_stage + ".", data=PublicData()))
+        return publish
+    worker.pipeline_activity = pipeline_activity

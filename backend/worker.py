@@ -54,6 +54,7 @@ class Worker:
     def __init__(self, store: Store, settings: Settings) -> None:
         self.store, self.settings = store, settings
         self.activity_context = None
+        self.pipeline_activity = None
 
     async def run_research(self, job: dict, request: dict) -> dict:
         if self.settings.research is research_market and self.activity_context:
@@ -219,7 +220,8 @@ class Worker:
                 try:
                     decision = await asyncio.to_thread(decide, goal, copies, reports, reservations,
                         data_dir=self.store.root / "main-agent" / digest(owner),
-                        job_id=job["job_id"] + ":r" + str(job["revision"]), facts=facts)
+                        job_id=job["job_id"] + ":r" + str(job["revision"]), facts=facts,
+                        on_activity=self.pipeline_activity(job) if self.pipeline_activity else None)
                 except MainAgentNeedsInput as exc:
                     with self.store.transaction() as db:
                         current = self.store.get(db, owner, "job", job["job_id"])

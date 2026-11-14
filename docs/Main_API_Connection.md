@@ -3,8 +3,8 @@
 `POST /api/v1/jobs` with `type: decision` uses the existing durable worker.
 After clarification and research, the non-fixture path delegates to
 `backend/main_agent.py::decide(...)`, which creates the teammate-owned
-`MainAgent`, imports reports, creates a decision job and awaits `run_job()`.
-The adapter does not edit
+`orchestrator.Pipeline`, supplies saved reports and explicit observation facts,
+and executes `Pipeline.start()`. The adapter does not edit
 or duplicate the teammate implementation. Job results and lifecycle SSE retain
 the existing API envelope and persistence.
 
@@ -32,5 +32,10 @@ start a second job scheduler or duplicate research inside this callback.
 Failed standalone research reports are retained and mark their job failed;
 partial research reports remain successful completed jobs with partial results.
 
-Remaining integration: detailed main-agent step activity and frontend consumption.
-Live trading remains disabled.
+Main pipeline stage updates publish as producer `pokescout-main`, operations
+`pipeline.identify`, `pipeline.research`, `pipeline.decision`, `pipeline.clarify`
+and `pipeline.finished`. Research still runs through the existing AgentField
+client before pipeline planning, preserving provider-step SSE and avoiding a
+duplicate provider call. The API does not enable Pipeline's optional automatic
+fixture execution; authorized fixture action intents retain their existing path.
+Frontend consumption remains frontend work. Live trading remains disabled.

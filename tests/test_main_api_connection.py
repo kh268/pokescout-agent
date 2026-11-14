@@ -97,6 +97,9 @@ class MainConnectionTests(unittest.TestCase):
         self.assertEqual(decision['calculations']['purchase_total_jpy'], 0)
         events = self.client.get('/api/v1/activity', params={'job_id': done['job_id']}).json()['data']['items']
         self.assertEqual(events[-1]['type'], 'job.succeeded')
+        main_events = [event for event in events if event['producer_id'] == 'pokescout-main']
+        self.assertTrue(main_events)
+        self.assertIn('pipeline.decision', [event['operation'] for event in main_events])
 
     def test_failed_research_retains_report_and_fails_job(self):
         async def failed(request):

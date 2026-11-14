@@ -3,6 +3,7 @@
 **Status: implemented in `activity_server.py`, `activity.py` and `backend/activity.py`.**
 The application API mounts the stream using its existing sessions and atomic
 job-write hook. The research AgentField node publishes real operation boundaries.
+The merged main pipeline publishes its actual stage updates as `pokescout-main`.
 Other agents can use the shared publisher; their detailed steps need wiring.
 This is the shared contract for the application backend, frontend and all agent
 workstreams. It supplements [Frontend_API_Contract.md](Frontend_API_Contract.md).
