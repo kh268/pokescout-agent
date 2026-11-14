@@ -151,7 +151,7 @@ CodeAF evidence should consist of an actual development run and its reviewed dif
 ```text
 identify_card(images) -> IdentityCandidates
 confirm_copy(candidate, corrections) -> OwnedCopy
-research_market(identity, cohort, limits) -> Observations
+research_market(request: ResearchRequest) -> ResearchReport
 analyze_listing(observation) -> EvidenceFields
 plan_decision(goal, collection, observations) -> Decision
 prepare_action(decision, policy) -> ActionIntent
@@ -249,7 +249,7 @@ schemas.py card, copy, listing, decision and action models
 collection.py SQLite inventory and cash reservations
 vision.py Gemini image extraction and field evidence
 psa.py authorized certificate lookup and comparison
-research.py Tavily discovery and source retrieval
+research.py ResearchRequest -> ResearchReport; query planning/refinement, source inspection and cited synthesis (research-agent workstream; see docs/Research_Agent_Contract.md)
 listing_analysis.py Nosana Qwen extraction and explanations
 decision.py deterministic filters, arithmetic and allocation
 selling.py grounded title and description drafting
@@ -1159,7 +1159,7 @@ Keep the existing working raw-card path until the replacement passes the same be
 | --- | --- | --- | --- |
 | `identify_card` | Image references | Candidate identity and evidence | Provider call and observation log |
 | `confirm_copy` | Candidate, user corrections, ownership assertion | Owned-copy ID | Collection write |
-| `research_market` | Confirmed target and source limits | Listing observations | Retrieval and immutable observations |
+| `research_market` | ResearchRequest | ResearchReport | Planning/refinement, inspection, comparison and cited synthesis; Python arithmetic/rankings; see Research_Agent_Contract.md |
 | `analyze_listing` | One observation | Validated extracted fields | Model call and extraction record |
 | `plan_decision` | Goal version, collection, observations | Selection, rejections and calculations | Decision record only |
 | `draft_sale` | Owned copy and confirmed facts | Draft and claim map | Draft record only |
