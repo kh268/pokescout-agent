@@ -10,6 +10,7 @@ import os
 import sqlite3
 import threading
 import uuid
+from contextlib import closing
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
@@ -18,7 +19,7 @@ from collection import Collection
 class TestMarket:
     def __init__(self,listings,path):
         self.listings={r['id']:r for r in listings};self.path=str(path)
-        with sqlite3.connect(self.path) as db:
+        with closing(sqlite3.connect(self.path)) as db, db:
             db.execute('CREATE TABLE IF NOT EXISTS orders(intent TEXT PRIMARY KEY, listing TEXT UNIQUE, total INTEGER, receipt TEXT UNIQUE)')
         market=self
         class Handler(BaseHTTPRequestHandler):
@@ -62,7 +63,7 @@ class TestMarket:
     def __enter__(self):self.thread.start();return self
     def __exit__(self,*args):self.server.shutdown();self.server.server_close();self.thread.join()
     def lookup(self,intent):
-        with sqlite3.connect(self.path) as db:
+        with closing(sqlite3.connect(self.path)) as db, db:
             db.row_factory=sqlite3.Row
             row=db.execute('SELECT * FROM orders WHERE intent=?',(intent,)).fetchone()
             return dict(row) if row else None
@@ -75,7 +76,7 @@ class TestMarket:
         if any(type(v) is not int or v<0 for v in values):raise ValueError('Unknown or invalid total.')
         total=sum(values)
         if total>ceiling:raise ValueError('Price exceeds authorized ceiling.')
-        with sqlite3.connect(self.path) as db:
+        with closing(sqlite3.connect(self.path)) as db, db:
             db.execute('BEGIN IMMEDIATE')
             old=db.execute('SELECT listing,total,receipt FROM orders WHERE intent=?',(intent,)).fetchone()
             if old:

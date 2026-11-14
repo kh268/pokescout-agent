@@ -7,6 +7,16 @@ it into `pokescout.py::full_run()` or replace `providers.py` in parallel.
 Approved interface: `research_market(request: ResearchRequest) -> ResearchReport`.
 Canonical Python/JSON field names are defined in the root `research.py`.
 
+Frontend-visible progress follows [Activity_Stream_Contract.md](Activity_Stream_Contract.md).
+The application passes a separate internal activity context to the AgentField
+transport wrapper. It does not add telemetry credentials to ResearchRequest or
+ResearchReport. Plan/search/inspect/compare/synthesis events use the central
+publisher; existing raw JSONL logs are private and must not be streamed directly.
+Implemented: the shared Python client accepts keyword-only `activity_context`.
+It sends a private header to the AgentField node, whose middleware strips it
+before SDK handling. With context, real research steps publish to the central
+stream; without context, invocation and report behavior remain unchanged.
+
 The research agent owns query planning/refinement, source inspection, comparison
 and evidence-backed synthesis. Python owns arithmetic and rankings. The decision
 agent retains all budget/collection-based buy/sell decisions.

@@ -8,6 +8,7 @@ CLI commands remain supported while the HTTP adapter is implemented.
 Related contracts: [research](Research_Agent_Contract.md),
 [decision/trading](Decision_Trading_Agent_Contract.md),
 [storage](Storage_Contract.md), and [image recognition](image-recognition.md).
+Live progress uses the shared [central activity/SSE contract](Activity_Stream_Contract.md).
 This document replaces the product plan's illustrative frontend endpoint list.
 It does not rename the existing agents' Python arguments or wire envelopes.
 
@@ -76,6 +77,8 @@ recognized before rejecting an old revision from that same completed request.
 | `GET /uploads/{id}` | 200: saved group metadata and authorized image URLs. |
 | `POST /jobs` | 202: create an identification, research or decision job. |
 | `GET /jobs/{id}` | 200: durable job state, questions, progress and result references. |
+| `GET /activity/stream` | SSE: shared activity timeline for the current session; optional job filter and replay cursor. |
+| `GET /activity` | 200: paginated activity history. See Activity_Stream_Contract.md. |
 | `POST /jobs/{id}/answers` | 202: validate answers and resume that job. |
 | `POST /jobs/{id}/cancel` | 202: record a cancellation request. |
 | `GET /candidates/{id}` | 200: one unconfirmed identity candidate. |
@@ -96,7 +99,12 @@ recognized before rejecting an old revision from that same completed request.
 
 `GET /capabilities` data is `{features, limits}`. Feature keys are `identify`,
 `research`, `decision`, `sale_draft`, `fixture_execution`, `live_execution`,
-`watch`, `forecast`; values are booleans. `limits` contains `max_views_per_upload`,
+`watch`, `forecast`, `activity_stream`; values are booleans. Keep `activity_stream`
+false unless the central SSE/replay implementation is mounted. The application
+now mounts it through `backend/activity.py` and advertises `activity_stream=true`.
+Detailed agent steps are currently integrated for the research AgentField node;
+all application jobs publish lifecycle events.
+`limits` contains `max_views_per_upload`,
 `max_upload_bytes`, `max_active_jobs`, `job_timeout_seconds`. Disabled mutations
 return 409 `FEATURE_UNAVAILABLE`, not a fabricated success. A missing provider
 configuration disables the affected feature. No credential values are returned.
@@ -259,9 +267,11 @@ snapshot, then invokes the decision contract. It must:
 ## 4. Durable job protocol
 
 All job-creating endpoints return 202, `Location: /api/v1/jobs/<id>`,
-`Retry-After: 2`, and the complete `Job` in the success envelope. Poll
-`GET /jobs/{id}` every two seconds while active; stop on a terminal state.
-SSE/websockets are not required for v1.
+`Retry-After: 2`, and the complete `Job` in the success envelope. Subscribe to
+`GET /activity/stream` for live progress using Activity_Stream_Contract.md.
+The central SSE service is the target transport; its implementation status must
+be advertised accurately. If unavailable, poll `GET /jobs/{id}` every two seconds
+while active; stop polling on a terminal state. Job snapshots remain authoritative.
 
 `Job` always contains:
 

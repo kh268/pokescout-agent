@@ -12,6 +12,8 @@ import urllib.error
 import urllib.request
 from typing import Literal, NotRequired, TypedDict
 
+from activity import ActivityContext, HEADER
+
 
 class ConfirmedTarget(TypedDict):
     name_ja: str
@@ -106,7 +108,7 @@ class ResearchUnavailable(RuntimeError):
     """The research service could not supply a report; no fake fallback is used."""
 
 
-async def research_market(request: ResearchRequest) -> ResearchReport:
+async def research_market(request: ResearchRequest, *, activity_context: ActivityContext | None = None) -> ResearchReport:
     """Invoke the experimental AgentField reasoner without changing the main pipeline.
 
     Set RESEARCH_AGENT_URL to the agent origin (default http://127.0.0.1:18081).
@@ -119,9 +121,12 @@ async def research_market(request: ResearchRequest) -> ResearchReport:
     def invoke() -> ResearchReport:
         # Direct node endpoints take function arguments; only the control plane uses input.
         payload = json.dumps({"request": request}).encode("utf-8")
+        headers = {"Content-Type": "application/json"}
+        if activity_context:
+            headers[HEADER] = activity_context.to_header()
         call = urllib.request.Request(
             origin + "/reasoners/research_market", data=payload,
-            headers={"Content-Type": "application/json"}, method="POST",
+            headers=headers, method="POST",
         )
         try:
             with urllib.request.urlopen(call, timeout=timeout) as response:
