@@ -141,3 +141,24 @@ class Authorization(Model):
 
 class Empty(Model):
     pass
+
+
+class ListingCondition(Model):
+    condition_raw: str
+    condition_normalized: Literal["near_mint", "unused", "played", "damaged", "unknown"]
+    condition_basis: Literal["user_confirmed"]
+
+
+class ListingFacts(Model):
+    card: Card
+    quantity: Annotated[int, Field(strict=True, ge=1, le=100)]
+    purchase_fee_jpy: Money | None
+    condition_record: ListingCondition | None = None
+    registry_status: Literal["registry_match", "registry_mismatch", "lookup_unavailable", "not_checked"] = "not_checked"
+
+
+class ListingConfirmation(Model):
+    listing_id: str = Field(min_length=1, max_length=160)
+    observed_at: str = Field(min_length=1, max_length=80)
+    confirmed: Literal[True]
+    facts: ListingFacts

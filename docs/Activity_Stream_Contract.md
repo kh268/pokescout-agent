@@ -335,6 +335,7 @@ From the repository root, use Python 3.12 and the experiment virtual environment
 ```powershell
 .\experiments\sc\.venv\Scripts\python.exe -m pip install -r requirements-activity.txt
 # Standalone activity transport, for local experiments:
+$env:ACTIVITY_PUBLISH_URL = 'http://127.0.0.1:18082/internal/v1/activity/events'
 .\experiments\sc\.venv\Scripts\python.exe -X utf8 activity_server.py
 # Separate terminal; AgentField research service must already be running:
 .\experiments\sc\.venv\Scripts\python.exe -X utf8 activity_demo.py --research
@@ -351,7 +352,10 @@ of browser cookies/CSRF.
 For application port 8000, set
 `ACTIVITY_PUBLISH_URL=http://127.0.0.1:8000/internal/v1/activity/events` in **both**
 the application and research-node environments before starting them. Both must
-use the same database. The default URL remains port 18082 for the experiment.
+use the same database. The shared publisher now defaults to application port
+8000. The backend launcher derives its publisher URL from `--port` unless an
+explicit URL is configured. Standalone experiments on 18082 must set the URL
+in both the demo/backend and research-node environments.
 Backend workers automatically pass context to the canonical research client.
 Custom injected research adapters retain their existing one-argument interface.
 

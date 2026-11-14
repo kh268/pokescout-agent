@@ -27,7 +27,7 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 from cards import validate_card
 
 from .models import (Answers, Authorization, Card, ConfirmCopy, DecisionInput, DraftRequest,
-                     Empty, Goal, IntentRequest, JobRequest, Model)
+                     Empty, Goal, IntentRequest, JobRequest, Model, ListingConfirmation)
 from .store import APIError, Store, digest, encoded, now, uid
 from .worker import Settings, TERMINAL, Worker, new_job, public_job
 
@@ -415,6 +415,30 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         if not path.is_relative_to(store.root) or not path.is_file():
             raise APIError(404, "NOT_FOUND", "Image not found.")
         return FileResponse(path, media_type=data["mime_type"], headers={"X-Content-Type-Options": "nosniff"})
+
+    @app.post(PREFIX + "/research-reports/{key}/listing-confirmations")
+    def confirm_listing(request: Request, key: str, body: ListingConfirmation):
+        def save(db, owner):
+            from agent_store import AgentError
+            from research_decisions import confirmed_facts
+            report = store.get(db, owner, "research_report", key)
+            row = next((row for row in report["listings"] if row["listing_id"] == body.listing_id
+                        and row["observed_at"] == body.observed_at), None)
+            if row is None:
+                raise APIError(404, "NOT_FOUND", "Observation not found in this research report.")
+            try:
+                fact = confirmed_facts(key, row, body.facts.model_dump())
+            except (AgentError, ValueError, TypeError):
+                raise APIError(422, "INVALID_INPUT", "Listing facts could not be confirmed.") from None
+            existing = db.execute("SELECT owner,data FROM api_records WHERE kind='listing_fact' AND id=?", (fact["fact_id"],)).fetchone()
+            if existing:
+                old = json.loads(existing["data"])
+                if existing["owner"] != owner or {k:v for k,v in old.items() if k != "confirmed_at"} != {k:v for k,v in fact.items() if k != "confirmed_at"}:
+                    raise APIError(409, "ARTIFACT_CONFLICT", "Confirmed facts are immutable; use a new observation for corrections.")
+                return old
+            store.put(db, owner, "listing_fact", fact["fact_id"], fact)
+            return fact
+        return mutate(request, body.model_dump(), 201, save)
 
     @app.post(PREFIX + "/sale-drafts")
     def sale_draft(request: Request, body: DraftRequest):

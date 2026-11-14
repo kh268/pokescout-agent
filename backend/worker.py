@@ -207,9 +207,10 @@ class Worker:
                     current["_input"]["research_run_ids"].append(report["run_id"])
                     self.store.put(db, owner, "job", job["job_id"], current)
         if not self.settings.fixture_listings:
-            from .main_agent import decide
+            from .main_agent import decide, MainAgentNeedsInput
             with self.store.transaction() as db:
                 reservations = db.execute("SELECT COALESCE(SUM(total),0) FROM api_reservations WHERE owner=? AND state='reserved'", (owner,)).fetchone()[0]
+                facts = self.store.rows(db, owner, "listing_fact")
             if self.settings.main_agent:
                 decision = await asyncio.to_thread(self.settings.main_agent, goal, copies, reports, reservations)
             else:
@@ -217,7 +218,17 @@ class Worker:
                 from .store import digest
                 try:
                     decision = await asyncio.to_thread(decide, goal, copies, reports, reservations,
-                        data_dir=self.store.root / "main-agent" / digest(owner), job_id=job["job_id"])
+                        data_dir=self.store.root / "main-agent" / digest(owner),
+                        job_id=job["job_id"] + ":r" + str(job["revision"]), facts=facts)
+                except MainAgentNeedsInput as exc:
+                    with self.store.transaction() as db:
+                        current = self.store.get(db, owner, "job", job["job_id"])
+                        if current["state"] == "cancel_requested":
+                            self.store.save_job(db, owner, current, "cancelled")
+                        else:
+                            current["questions"], current["stage"], current["_waiting_at"] = exc.questions, "clarify", time.time()
+                            self.store.save_job(db, owner, current, "awaiting_input")
+                    return
                 except AgentError as exc:
                     raise APIError(502, exc.code, str(exc), retryable=exc.retryable) from None
             decision["goal_snapshot"] = goal

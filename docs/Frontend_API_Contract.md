@@ -79,6 +79,7 @@ recognized before rejecting an old revision from that same completed request.
 | `GET /jobs/{id}` | 200: durable job state, questions, progress and result references. |
 | `GET /activity/stream` | SSE: shared activity timeline for the current session; optional job filter and replay cursor. |
 | `GET /activity` | 200: paginated activity history. See Activity_Stream_Contract.md. |
+| `POST /research-reports/{id}/listing-confirmations` | 201: immutable explicit facts for one exact observed listing; enables compatible verified evidence to enter planning. |
 | `POST /jobs/{id}/answers` | 202: validate answers and resume that job. |
 | `POST /jobs/{id}/cancel` | 202: record a cancellation request. |
 | `GET /candidates/{id}` | 200: one unconfirmed identity candidate. |
@@ -474,3 +475,33 @@ No routes or storage migrations are implemented by this document. The first
 backend slice is session/capabilities, uploads, durable identify/research/decision
 jobs, copy confirmation and collection reads. Add draft/fixture-action endpoints
 next. Keep `live_execution`, `watch` and `forecast` disabled until implemented.
+
+
+## Listing observation confirmation
+
+POST `/api/v1/research-reports/{run_id}/listing-confirmations` uses the normal
+session, CSRF and UUID idempotency headers. Body:
+
+```json
+{
+  "listing_id": "s1",
+  "observed_at": "<exact timestamp from the report observation>",
+  "confirmed": true,
+  "facts": {
+    "card": "<complete confirmed Card object, not a string>",
+    "quantity": 1,
+    "purchase_fee_jpy": 0,
+    "condition_record": null,
+    "registry_status": "not_checked"
+  }
+}
+```
+
+The response contains the immutable fact record. Changed facts for the same
+observation return 409; another session's report returns 404. If normalizing
+condition wording, supply `{condition_raw, condition_normalized,
+condition_basis: "user_confirmed"}`; retain the report's exact raw wording.
+A confirmation does not change source verification, price, availability or
+observation time. Snippets, stale evidence and unknown acquisition costs remain
+ineligible. Create a new decision job with `research_run_ids: [run_id]` after
+confirmation. Purchase execution remains disabled for live marketplaces.
