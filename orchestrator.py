@@ -11,7 +11,7 @@ import hashlib
 import json
 from pathlib import Path
 
-from agent_inputs import apply_answers, goal_questions, object_fields, validate_goal
+from agent_inputs import apply_answers, goal_questions, object_fields, question, validate_goal
 from agent_store import AgentError, AgentStore, digest, new_id, utcnow
 from cards import money, validate_card
 from image_agent import recognize_card
@@ -38,6 +38,8 @@ def validate_input(value):
         not isinstance(path, str) or not path for path in result["images"]
     ):
         raise AgentError("INVALID_INPUT", "Supply at most four image paths for one card.")
+    if result["images"] and (result["goal"]["intent"] == "sell" or len(result["goal"]["targets"]) > 1):
+        raise AgentError("INVALID_INPUT", "Image intake supports one buy or assess target; sell from a confirmed owned copy.")
     if not isinstance(result["reports"], list) or len(result["reports"]) > 10:
         raise AgentError("INVALID_INPUT", "Supply at most ten research reports.")
     if result["reports"] and result["fixture_listings"] is not None:
@@ -146,6 +148,8 @@ class Pipeline:
                 raise AgentError("INVALID_STATE", "Job is not waiting for answers.")
             request, checkpoint = self.store.private_job(job_id)
             request["goal"] = apply_answers(request["goal"], job["questions"], answers)
+            if any(q["field"] == "targets.0.card" for q in job["questions"]):
+                checkpoint["candidate_confirmed"] = True
             job["state"], job["stage"], job["questions"] = "queued", "queued", []
             self.store.put_job(job, input_value=request, checkpoint=checkpoint)
         return self.run(job_id)
@@ -196,6 +200,11 @@ class Pipeline:
                 self._update(job, checkpoint, "running", "identify", "Candidate saved for confirmation", 1)
             snapshot = self._collection_snapshot(request["fixture_listings"] is not None)
             questions = goal_questions(request["goal"], snapshot["copies"])
+            if request["images"] and not checkpoint.get("candidate_confirmed") and not any(
+                q["field"] == "targets.0.card" for q in questions
+            ):
+                questions.insert(0, question("targets.0.card",
+                    "Confirm or correct the image candidate's exact printing and grading cohort.", "card"))
             if questions:
                 self._update(job, checkpoint, "awaiting_input", "clarify", "Confirm missing goal fields", 1,
                              questions=questions)
@@ -240,7 +249,10 @@ class Pipeline:
                 raise AgentError("INVALID_INPUT", "Listing confirmations must match current observation IDs.")
             checkpoint["research_run_ids"] = [report["run_id"] for report in reports]
             self._update(job, checkpoint, "running", "decision", "Applying purchase rules", 2)
-            decision = plan_decision(request["goal"], snapshot, reports, facts, source_modes)
+            pending = {action["listing"] for action in self.store.collection.actions()
+                       if action["state"] in {"reserved", "unknown", "confirmed"}}
+            decision = plan_decision(request["goal"], snapshot, reports, facts, source_modes,
+                                     pending_listing_ids=pending if request["fixture_listings"] is not None else None)
             self._artifact("decisions", decision["decision_id"], decision)
             checkpoint["decision_id"] = decision["decision_id"]
             ref = {"kind": "decision", "id": decision["decision_id"],
@@ -252,18 +264,39 @@ class Pipeline:
                 draft_id = new_id("draft")
                 self._artifact("drafts", draft_id, sale)
                 ref = {"kind": "sale_draft", "id": draft_id, "url": None}
-            if request["execute_fixture"]:
+            if request["execute_fixture"] and decision["purchase_candidates"]:
                 if checkpoint.get("fixture_execution_started"):
                     raise AgentError("ACTION_UNRESOLVED", "Fixture action was already started; inspect its ledger.")
+                selected = [item["listing_ref"]["listing_id"] for item in decision["purchase_candidates"]]
+                reservations = [(job_id + "-" + item["listing_ref"]["listing_id"],
+                                 item["listing_ref"]["listing_id"], item["acquisition_total_jpy"])
+                                for item in decision["purchase_candidates"]]
+                try:
+                    self.store.collection.reserve_fixture_batch(
+                        reservations, request["goal"]["budget_jpy"], request["goal"]["reserve_jpy"])
+                except ValueError as exc:
+                    raise AgentError("ACTION_RESERVATION_FAILED", str(exc)) from exc
                 checkpoint["fixture_execution_started"] = True
                 self._update(job, checkpoint, "running", "execute", "Executing test-market orders", 3)
                 executor = self.fixture_executor
                 if executor is None:
                     from fixture_market import run_browser_fixture
                     executor = run_browser_fixture
-                selected = [item["listing_ref"]["listing_id"] for item in decision["purchase_candidates"]]
-                execution = executor(request["goal"], request["fixture_listings"], selected,
-                                     self.store.root / "fixture_browser" / job_id)
+                try:
+                    execution = executor(request["goal"], request["fixture_listings"], selected,
+                                         self.store.root / "fixture_browser" / job_id)
+                    orders = {order["listing"]: order for order in execution["orders"]}
+                    if set(orders) != set(selected):
+                        raise ValueError("Test order verification is incomplete.")
+                    for intent, listing_id, total in reservations:
+                        order = orders[listing_id]
+                        if order.get("total") != total or not str(order.get("receipt", "")).startswith("TEST-"):
+                            raise ValueError("Test order amount or receipt is invalid.")
+                        self.store.collection.confirm_fixture(intent, order["receipt"])
+                except Exception:
+                    for intent, _, _ in reservations:
+                        self.store.collection.unknown(intent)
+                    raise
                 self._artifact("snapshots", "execution-" + job_id, execution)
                 checkpoint["fixture_execution_id"] = "execution-" + job_id
             self._update(job, checkpoint, "succeeded", "finished", "Workflow complete", 4, result=ref)

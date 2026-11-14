@@ -108,7 +108,8 @@ def confirmed_facts(run_id, row, value, *, fixture=False):
             "confirmation_basis": "synthetic_fixture" if fixture else "explicit_user_confirmation"}
 
 
-def adapt_reports(reports, facts, source_modes, *, now=None, max_age_seconds=900):
+def adapt_reports(reports, facts, source_modes, *, now=None, max_age_seconds=900,
+                  pending_listing_ids=None):
     """Retain every rejection and observation ref; only pass validated rows to plan()."""
     now = now or datetime.now(timezone.utc)
     offers, rejected, evidence_refs, seen = [], [], [], {}
@@ -136,6 +137,8 @@ def adapt_reports(reports, facts, source_modes, *, now=None, max_age_seconds=900
                 reasons.append("SOURCE_NOT_VERIFIED")
             if row.get("availability") != "available":
                 reasons.append("NOT_AVAILABLE")
+            if row["listing_id"] in (pending_listing_ids or set()):
+                reasons.append("DUPLICATE_OR_PENDING_PURCHASE")
             if row.get("currency") != "JPY":
                 reasons.append("CURRENCY_MISMATCH")
             fact = facts.get(key)
@@ -195,9 +198,11 @@ def adapt_reports(reports, facts, source_modes, *, now=None, max_age_seconds=900
     return offers[:16], rejected, evidence_refs
 
 
-def plan_decision(goal, collection, reports, facts, source_modes, *, max_age_seconds=900):
+def plan_decision(goal, collection, reports, facts, source_modes, *, max_age_seconds=900,
+                  pending_listing_ids=None):
     """Decision/trading contract wrapper; makes no reservations or external trades."""
-    offers, rejections, refs = adapt_reports(reports, facts, source_modes, max_age_seconds=max_age_seconds)
+    offers, rejections, refs = adapt_reports(reports, facts, source_modes,
+        max_age_seconds=max_age_seconds, pending_listing_ids=pending_listing_ids)
     decision_id = new_id("decision")
     result = {"schema_version": "1.0", "decision_id": decision_id, "created_at": utcnow(),
               "rule_version": "main-agent-1.0/planner-0.2", "goal_ref": "goal-" + digest(goal),

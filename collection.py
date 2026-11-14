@@ -47,6 +47,28 @@ class Collection:
             self.db.execute('INSERT INTO fixture_actions VALUES(?,?,?,?,NULL)',(intent,listing,total,'reserved'))
             self.db.execute('COMMIT')
         except Exception:self.db.execute('ROLLBACK');raise
+    def reserve_fixture_batch(self,items,budget,reserve):
+        """Reserve a whole synthetic selection atomically before browser submission."""
+        money(budget,'budget');money(reserve,'reserve')
+        if not isinstance(items,list) or not items:
+            raise ValueError('At least one fixture action is required.')
+        for intent,listing,total in items:
+            if not isinstance(intent,str) or not intent or not isinstance(listing,str) or not listing:
+                raise ValueError('Fixture action IDs and listing IDs are required.')
+            money(total,'total')
+        if len({item[0] for item in items})!=len(items) or len({item[1] for item in items})!=len(items):
+            raise ValueError('Duplicate fixture action in batch.')
+        self.db.execute('BEGIN IMMEDIATE')
+        try:
+            used=self.db.execute("SELECT COALESCE(SUM(total),0) FROM fixture_actions WHERE state IN ('reserved','unknown','confirmed')").fetchone()[0]
+            if used+sum(item[2] for item in items)>budget-reserve:
+                raise ValueError('Budget or reserve would be exceeded.')
+            for intent,listing,total in items:
+                if self.db.execute('SELECT 1 FROM fixture_actions WHERE id=? OR listing=?',(intent,listing)).fetchone():
+                    raise ValueError('Duplicate or unresolved action; reconcile instead of resubmitting.')
+                self.db.execute('INSERT INTO fixture_actions VALUES(?,?,?,?,NULL)',(intent,listing,total,'reserved'))
+            self.db.execute('COMMIT')
+        except Exception:self.db.execute('ROLLBACK');raise
     def unknown(self,intent):
         self.db.execute("UPDATE fixture_actions SET state='unknown' WHERE id=? AND state='reserved'",(intent,))
     def confirm_fixture(self,intent,receipt):

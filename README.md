@@ -23,6 +23,10 @@ and sale publication are not enabled.
 
 `start` accepts a JSON object with `goal` and optional `images`, `reports`,
 `facts`, `fixture_listings`, `asking_price_jpy` and `execute_fixture` fields.
+`facts` is keyed by the report's computed observation ID and each value must
+explicitly confirm `card`, `quantity`, and `purchase_fee_jpy`; optional condition
+normalization must retain the seller's original wording. The pipeline validates
+these sidecars against the saved observation before evaluating eligibility.
 When a job returns `awaiting_input`, save answers as a JSON array of
 `{question_id, value}` objects, then run `pipeline answer JOB_ID --answers
 answers.json --revision N`. An image candidate never confirms a card or its
@@ -30,8 +34,11 @@ ownership automatically. `execute_fixture: true` is accepted only for a fixture
 buy request and submits synthetic test orders; omit it for a decision-only run.
 For that optional local browser test, install `requirements-browser.txt` and run
 `python -m playwright install chromium`. The ordinary demo needs neither.
+Fixture selections reserve the budget and listing IDs in durable SQLite before
+browser submission. A lost execution response leaves those reservations
+`unknown` and blocks another attempt until reconciled.
 
-The HTTP backend has its own authenticated, session-scoped job store. Its
+The HTTP backend has its own session-scoped job store. Its
 research-to-decision path now uses `research_decisions.py` to preserve exclusion
 reasons from the shared research contract. The CLI pipeline's data directory is
 not exposed as HTTP resources; its `result` command reads its saved artifacts.

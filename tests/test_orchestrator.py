@@ -73,6 +73,19 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(len(calls), 1)
         self.assertEqual(self.pipeline.result(job["job_id"])["recommendation"], "buy")
 
+    def test_image_with_existing_target_still_requires_confirmation(self):
+        self.pipeline.close()
+        self.pipeline = Pipeline(self.path, identify=lambda _: {"ok": True, "card": self.rows[0]["card"]})
+        goal = buy_goal()
+        goal["targets"] = goal["targets"][:1]
+        job = self.pipeline.start({"goal": goal, "images": ["card.png"],
+                                   "fixture_listings": self.rows})
+        self.assertEqual(job["state"], "awaiting_input")
+        self.assertEqual([q["field"] for q in job["questions"]], ["targets.0.card"])
+        answered = self.pipeline.answer(job["job_id"], [{"question_id": job["questions"][0]["question_id"],
+            "value": self.rows[0]["card"]}], revision=job["revision"])
+        self.assertEqual(answered["state"], "succeeded")
+
     def test_unconfirmed_live_listing_does_not_become_buy_candidate(self):
         report, _ = fixture_report([self.rows[1]])
         report["listings"][0]["url"] = "https://jp.mercari.com/item/m123456"
@@ -104,7 +117,11 @@ class PipelineTests(unittest.TestCase):
         calls = []
         def execute(goal, listings, selected, out):
             calls.append(selected)
-            return {"mode": "synthetic_fixture", "orders": [], "selected": selected,
+            by_id = {row["id"]: row for row in listings}
+            orders = [{"listing": listing_id, "total": sum(by_id[listing_id][field]
+                       for field in ("price_jpy", "shipping_jpy", "purchase_fee_jpy")),
+                       "receipt": "TEST-" + listing_id} for listing_id in selected]
+            return {"mode": "synthetic_fixture", "orders": orders, "selected": selected,
                     "live_marketplace_transactions": 0}
         self.pipeline.close()
         self.pipeline = Pipeline(self.path, fixture_executor=execute)
@@ -114,6 +131,28 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(calls, [["A2", "B1"]])
         self.pipeline.start({"goal": buy_goal(), "fixture_listings": self.rows,
                              "execute_fixture": True}, idempotency_key="test-order")
+        self.assertEqual(len(calls), 1)
+        another = self.pipeline.start({"goal": buy_goal(), "fixture_listings": self.rows,
+                                       "execute_fixture": True})
+        self.assertEqual(another["state"], "succeeded")
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(self.pipeline.result(another["job_id"])["recommendation"], "insufficient_evidence")
+
+    def test_lost_fixture_outcome_stays_reserved_and_is_not_retried(self):
+        calls = []
+        def fail_after_submission(*args):
+            calls.append(True)
+            raise TimeoutError("Simulated response loss")
+        self.pipeline.close()
+        self.pipeline = Pipeline(self.path, fixture_executor=fail_after_submission)
+        request = {"goal": buy_goal(), "fixture_listings": self.rows, "execute_fixture": True}
+        job = self.pipeline.start(request, idempotency_key="lost-test-order")
+        self.assertEqual(job["state"], "failed")
+        self.assertEqual({row["state"] for row in self.pipeline.store.collection.actions()}, {"unknown"})
+        self.pipeline.start(request, idempotency_key="lost-test-order")
+        self.assertEqual(len(calls), 1)
+        another = self.pipeline.start(request)
+        self.assertEqual(another["state"], "succeeded")
         self.assertEqual(len(calls), 1)
 
 
