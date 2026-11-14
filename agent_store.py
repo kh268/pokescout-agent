@@ -139,6 +139,16 @@ class AgentStore:
             raise AgentError("NOT_FOUND", "Job not found.")
         return json.loads(row[0])
 
+    def create_job(self, job, input_value, checkpoint):
+        self.db.execute(
+            "INSERT INTO main_jobs(id,body,input,checkpoint) VALUES(?,?,?,?)",
+            (job["job_id"], encoded(job), encoded(input_value), encoded(checkpoint)),
+        )
+        self.db.execute(
+            "INSERT INTO main_events(job_id,body) VALUES(?,?)",
+            (job["job_id"], encoded({"at": job["created_at"], "state": "queued", "stage": "queued", "revision": 0})),
+        )
+
     def private_job(self, job_id):
         self.get_job(job_id)
         row = self.db.execute("SELECT input,checkpoint FROM main_jobs WHERE id=?", (job_id,)).fetchone()

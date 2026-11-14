@@ -4,6 +4,38 @@ A Python agent for physical Pokémon card collection, marketplace research and b
 
 The release CLI modules remain at the repository root to preserve their existing imports. New backend-facing providers and a reusable Daytona browser worker are documented in [Provider Setup](docs/Provider_Setup.md). `RELEASE.json` and `MANIFEST.sha256` describe the earlier v0.2 release snapshot.
 
+## Connected workflow
+
+The persisted Python workflow now connects image intake, typed clarification,
+bounded research, evidence validation, deterministic purchase decisions and
+review-only sale drafting. It stores jobs, candidates, research reports and
+decisions under a chosen data directory. Research observations without confirmed
+printing, condition and fee facts remain rejected evidence. A labeled fixture
+can optionally execute test orders through Playwright; live marketplace buying
+and sale publication are not enabled.
+
+```powershell
+.\.venv\Scripts\python.exe pokescout.py pipeline --data-dir data/pipeline demo
+.\.venv\Scripts\python.exe pokescout.py pipeline --data-dir data/pipeline start --input request.json --idempotency-key my-request-1
+.\.venv\Scripts\python.exe pokescout.py pipeline --data-dir data/pipeline status JOB_ID
+.\.venv\Scripts\python.exe pokescout.py pipeline --data-dir data/pipeline result JOB_ID
+```
+
+`start` accepts a JSON object with `goal` and optional `images`, `reports`,
+`facts`, `fixture_listings`, `asking_price_jpy` and `execute_fixture` fields.
+When a job returns `awaiting_input`, save answers as a JSON array of
+`{question_id, value}` objects, then run `pipeline answer JOB_ID --answers
+answers.json --revision N`. An image candidate never confirms a card or its
+ownership automatically. `execute_fixture: true` is accepted only for a fixture
+buy request and submits synthetic test orders; omit it for a decision-only run.
+For that optional local browser test, install `requirements-browser.txt` and run
+`python -m playwright install chromium`. The ordinary demo needs neither.
+
+The HTTP backend has its own authenticated, session-scoped job store. Its
+research-to-decision path now uses `research_decisions.py` to preserve exclusion
+reasons from the shared research contract. The CLI pipeline's data directory is
+not exposed as HTTP resources; its `result` command reads its saved artifacts.
+
 **Start with the reproducible local demo. It needs no API keys and performs no real transactions.**
 
 ```bash

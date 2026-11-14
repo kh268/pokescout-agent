@@ -8,10 +8,12 @@ from pathlib import Path
 from typing import Awaitable, Callable
 
 from cards import validate_card
+from agent_store import AgentError, digest
 from decisions import plan
 from fixture_market import TestMarket
 from image_agent import recognize_card
 from research import research_market
+from research_decisions import plan_decision, validate_report
 from selling import draft
 
 from .models import Card, DecisionInput, ResearchRequest
@@ -203,6 +205,28 @@ class Worker:
                     current = self.store.get(db, owner, "job", job["job_id"])
                     current["_input"]["research_run_ids"].append(report["run_id"])
                     self.store.put(db, owner, "job", job["job_id"], current)
+        if reports and not self.settings.fixture_listings and goal["intent"] != "sell":
+            # Research observations are evidence, not complete purchasable offers.
+            # The shared adapter preserves every exclusion and requires explicit
+            # per-observation confirmation before any candidate can be selected.
+            with self.store.transaction() as db:
+                reserved = db.execute(
+                    "SELECT COALESCE(SUM(total),0) FROM api_reservations WHERE owner=? AND state='reserved'",
+                    (owner,),
+                ).fetchone()[0]
+            snapshot = {"copies": copies, "active_reservations_jpy": reserved, "cash_status": "unknown"}
+            snapshot["snapshot_id"] = "snapshot-" + digest(snapshot)
+            try:
+                for report in reports:
+                    validate_report(report)
+                decision = plan_decision(goal, snapshot, reports, {},
+                                         {report["run_id"]: "live_research" for report in reports})
+            except (AgentError, ValueError, TypeError, KeyError) as exc:
+                raise APIError(502, "INVALID_RESPONSE", "Research evidence could not be evaluated.") from exc
+            decision.update(source_mode="research_reports", goal_snapshot=goal,
+                            collection_snapshot=copies)
+            self.finish(owner, job["job_id"], "decision", decision["decision_id"], decision)
+            return
         # The current research schema does not establish complete set/variant identity
         # or purchase fees. Keep those observations as excluded evidence, not guessed offers.
         listings = copy.deepcopy(self.settings.fixture_listings)
