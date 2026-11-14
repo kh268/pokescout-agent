@@ -198,6 +198,9 @@ def main():
     if len(sys.argv)>1 and sys.argv[1]=='pipeline':
         from pipeline_cli import main as pipeline_main
         return pipeline_main(sys.argv[2:])
+    if len(sys.argv)>1 and sys.argv[1]=='agent':
+        from main_agent_cli import main as agent_main
+        return agent_main(sys.argv[2:])
     from workflow import COMMANDS, main as workflow_main
     if len(sys.argv)>1 and sys.argv[1] in COMMANDS:
         return workflow_main(sys.argv[1:])

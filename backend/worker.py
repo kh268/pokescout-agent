@@ -8,12 +8,10 @@ from pathlib import Path
 from typing import Awaitable, Callable
 
 from cards import validate_card
-from agent_store import AgentError, digest
 from decisions import plan
 from fixture_market import TestMarket
 from image_agent import recognize_card
 from research import research_market
-from research_decisions import plan_decision, validate_report
 from selling import draft
 
 from .models import Card, DecisionInput, ResearchRequest
@@ -32,6 +30,7 @@ class Settings:
     research: Callable[..., Awaitable[dict]] = research_market
     job_timeout: float = 180
     allowed_origins: list[str] = field(default_factory=list)
+    main_agent: Callable | None = None
 
 
 def new_job(owner: str, kind: str, inputs: dict) -> dict:
@@ -132,6 +131,8 @@ class Worker:
         elif job["type"] == "research":
             report = await self.run_research(job, inputs["request"])
             self.save_report(owner, report)
+            if report.get("status") == "failed":
+                raise APIError(502, "RESEARCH_FAILED", "Research failed; its evidence report was retained.")
             self.finish(owner, job["job_id"], "research_report", report["run_id"], report)
         elif job["type"] == "decision":
             await self.make_decision(owner, job)
@@ -205,26 +206,23 @@ class Worker:
                     current = self.store.get(db, owner, "job", job["job_id"])
                     current["_input"]["research_run_ids"].append(report["run_id"])
                     self.store.put(db, owner, "job", job["job_id"], current)
-        if reports and not self.settings.fixture_listings and goal["intent"] != "sell":
-            # Research observations are evidence, not complete purchasable offers.
-            # The shared adapter preserves every exclusion and requires explicit
-            # per-observation confirmation before any candidate can be selected.
+        if not self.settings.fixture_listings:
+            from .main_agent import decide
             with self.store.transaction() as db:
-                reserved = db.execute(
-                    "SELECT COALESCE(SUM(total),0) FROM api_reservations WHERE owner=? AND state='reserved'",
-                    (owner,),
-                ).fetchone()[0]
-            snapshot = {"copies": copies, "active_reservations_jpy": reserved, "cash_status": "unknown"}
-            snapshot["snapshot_id"] = "snapshot-" + digest(snapshot)
-            try:
-                for report in reports:
-                    validate_report(report)
-                decision = plan_decision(goal, snapshot, reports, {},
-                                         {report["run_id"]: "live_research" for report in reports})
-            except (AgentError, ValueError, TypeError, KeyError) as exc:
-                raise APIError(502, "INVALID_RESPONSE", "Research evidence could not be evaluated.") from exc
-            decision.update(source_mode="research_reports", goal_snapshot=goal,
-                            collection_snapshot=copies)
+                reservations = db.execute("SELECT COALESCE(SUM(total),0) FROM api_reservations WHERE owner=? AND state='reserved'", (owner,)).fetchone()[0]
+            if self.settings.main_agent:
+                decision = await asyncio.to_thread(self.settings.main_agent, goal, copies, reports, reservations)
+            else:
+                from agent_store import AgentError
+                from .store import digest
+                try:
+                    decision = await asyncio.to_thread(decide, goal, copies, reports, reservations,
+                        data_dir=self.store.root / "main-agent" / digest(owner), job_id=job["job_id"])
+                except AgentError as exc:
+                    raise APIError(502, exc.code, str(exc), retryable=exc.retryable) from None
+            decision["goal_snapshot"] = goal
+            decision["collection_snapshot"] = copies
+            decision["source_mode"] = "research_reports"
             self.finish(owner, job["job_id"], "decision", decision["decision_id"], decision)
             return
         # The current research schema does not establish complete set/variant identity

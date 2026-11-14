@@ -28,7 +28,10 @@ class ResearchDecisionBridgeTests(unittest.TestCase):
         report["listings"][0]["evidence"][0]["source_url"] = url
 
         async def research(_request):
-            return json.loads(json.dumps(report))
+            value = json.loads(json.dumps(report))
+            value["run_id"] = "market_" + uuid.uuid4().hex
+            value["request"] = _request
+            return value
 
         with tempfile.TemporaryDirectory() as directory:
             app = create_app(Settings(data_dir=Path(directory), research_enabled=True, research=research))

@@ -113,6 +113,23 @@ def adapt_reports(reports, facts, source_modes, *, now=None, max_age_seconds=900
     """Retain every rejection and observation ref; only pass validated rows to plan()."""
     now = now or datetime.now(timezone.utc)
     offers, rejected, evidence_refs, seen = [], [], [], {}
+    # Newer sold/unknown/unverified observations invalidate older positive stock,
+    # including when the newer observation itself cannot enter the planner.
+    latest, conflicting = {}, set()
+    for report in reports:
+        for row in report["listings"]:
+            try:
+                url = canonical_listing(row["url"], source_modes[report["run_id"]])
+                stamp = parse_time(row["observed_at"])
+            except (TypeError, ValueError):
+                continue
+            fingerprint = digest({k: row.get(k) for k in ("price", "shipping", "currency", "availability", "condition", "verification")})
+            entry = latest.get(url)
+            if entry is None or stamp > entry[0]:
+                latest[url] = (stamp, observation_key(report["run_id"], row), fingerprint)
+                conflicting.discard(url)
+            elif stamp == entry[0] and fingerprint != entry[2]:
+                conflicting.add(url)
     for report in reports:
         run_id = report["run_id"]
         mode = source_modes[run_id]
@@ -127,6 +144,11 @@ def adapt_reports(reports, facts, source_modes, *, now=None, max_age_seconds=900
             except (TypeError, ValueError):
                 canonical = key
                 reasons.append("SOURCE_NOT_ALLOWED")
+            latest_observation = latest.get(canonical)
+            if canonical in conflicting:
+                reasons.append("CONFLICTING_OBSERVATIONS")
+            elif latest_observation and latest_observation[1] != key:
+                reasons.append("DUPLICATE_OBSERVATION")
             try:
                 age = (now - parse_time(row["observed_at"])).total_seconds()
                 if mode != "fixture" and not -5 <= age <= max_age_seconds:
@@ -135,6 +157,13 @@ def adapt_reports(reports, facts, source_modes, *, now=None, max_age_seconds=900
                 reasons.append("OBSERVATION_TIME_UNKNOWN")
             if row.get("verification") != "verified_listing":
                 reasons.append("SOURCE_NOT_VERIFIED")
+            if mode != "fixture":
+                direct = [e for e in row["evidence"] if e.get("kind") == "direct_page" and e.get("source_url") == row["url"]]
+                if not direct:
+                    reasons.append("DIRECT_EVIDENCE_MISSING")
+                texts = "\n".join(e.get("content", "") for e in direct)
+                if any(not isinstance(quote, str) or not quote or quote not in texts for quote in row["field_evidence"].values()):
+                    reasons.append("FIELD_EVIDENCE_UNSUPPORTED")
             if row.get("availability") != "available":
                 reasons.append("NOT_AVAILABLE")
             if row["listing_id"] in (pending_listing_ids or set()):
@@ -216,6 +245,7 @@ def plan_decision(goal, collection, reports, facts, source_modes, *, max_age_sec
                             "uncertainty": r["uncertainty"], "failures": r["failures"]} for r in reports],
               "input_snapshot": {"goal": goal, "collection": collection},
               "execution": "none", "source_modes": source_modes}
+    incomplete_evidence = bool(rejections) or any(r["status"] != "complete" for r in reports)
     if goal["intent"] == "sell":
         # Selection of sale copies is supported; asking-price valuation isn't yet implemented.
         by_id = {c["id"]: c for c in collection["copies"]}
@@ -253,7 +283,7 @@ def plan_decision(goal, collection, reports, facts, source_modes, *, max_age_sec
     elif owned_complete:
         result["recommendation"] = "hold"
         result["rationale"] = ["The requested quantities are already owned and duplicate avoidance is enabled."]
-    elif any(c["eligible"] for c in planned["checked"]) and not rejections:
+    elif any(c["eligible"] for c in planned["checked"]) and not incomplete_evidence:
         result["recommendation"] = "hold"
         result["rationale"] = ["Inspected qualifying offers exceed the available spending allowance."]
     else:

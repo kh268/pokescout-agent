@@ -63,6 +63,8 @@ class AgentStore:
                     "CREATE TABLE main_assets(sha256 TEXT PRIMARY KEY, path TEXT NOT NULL, mime_type TEXT NOT NULL, size_bytes INTEGER NOT NULL, created_at TEXT NOT NULL)",
                     "CREATE TABLE main_copy_assets(copy_id TEXT NOT NULL REFERENCES copies(id), sha256 TEXT NOT NULL REFERENCES main_assets(sha256), role TEXT NOT NULL, PRIMARY KEY(copy_id,sha256,role))",
                     "CREATE TABLE main_intents(id TEXT PRIMARY KEY, body TEXT NOT NULL)",
+                    "CREATE TABLE main_fixture_reservations(intent_id TEXT PRIMARY KEY REFERENCES main_intents(id), listing TEXT NOT NULL, total INTEGER NOT NULL, state TEXT NOT NULL)",
+                    "CREATE UNIQUE INDEX main_fixture_listing_lock ON main_fixture_reservations(listing) WHERE state IN ('reserved','unknown','confirmed')",
                     "CREATE TABLE main_events(sequence INTEGER PRIMARY KEY AUTOINCREMENT, job_id TEXT NOT NULL REFERENCES main_jobs(id), body TEXT NOT NULL)",
                 ):
                     self.db.execute(statement)

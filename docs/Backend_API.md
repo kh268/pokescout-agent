@@ -153,7 +153,8 @@ in `/capabilities`.
 
 ## SSE integration boundary (owned by the activity workstream)
 
-The API does not implement another event journal or stream. `create_app()` exposes
+The API uses the activity workstream's `backend/activity.py` integration rather
+than implementing another event journal or stream. `create_app()` exposes
 `app.state.store` and `request.state.owner` after session validation.
 `store.on_job_event(db, owner, job, event_type)` is an optional synchronous hook.
 It is invoked **after the job is persisted, inside that same SQLite transaction**.
@@ -162,9 +163,10 @@ mount its router against the application's session resolver. Do not open a
 second writer transaction from inside the callback. `api_sessions` and
 `api_records` are the authoritative application session/job records.
 
-Set `app.state.activity_stream_enabled = True` only after mounting/verifying the
-activity implementation. Until then capabilities advertise false and polling
-works. No activity credentials are exposed through public jobs.
+The integration mounts the activity router against application sessions and
+registers the transactional hook. Capabilities report `activity_stream: true`
+when attached. Polling remains available. No activity credentials are exposed
+through public jobs.
 
 ## Verification
 
@@ -180,3 +182,17 @@ A separate live check used a public TCGdex card image through real Gemini and
 saved the resulting candidate in the application database. Its local record is
 `data/api-live-upload-check.json`; it did not assert possession or add that public
 sample to the user's collection.
+
+### Verified on 2026-11-14
+
+- All 73 main-project tests passed, including the activity workstream's tests;
+  the backend API suite contains 11 HTTP integration tests.
+- Live upload -> Gemini -> SQLite candidate succeeded as
+  `job_e41a7201391b481496131b310f39542e`. The model left `set` unknown; confirmation
+  remained required. No ownership was asserted for the public sample.
+- Live API -> research service -> Tavily/Gemini -> persisted report succeeded as
+  `job_6df14f939e5b4b0b9cb727e1e0c00c4a`. The report truthfully remained `partial`
+  with no verified qualifying offer. Its public response omitted local log paths.
+- Dependency consistency and whitespace checks passed. The API is listening
+  locally on port 8000 with the live research service configured; fixture
+  execution is disabled in that instance unless explicitly enabled at launch.

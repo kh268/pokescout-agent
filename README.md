@@ -38,10 +38,14 @@ Fixture selections reserve the budget and listing IDs in durable SQLite before
 browser submission. A lost execution response leaves those reservations
 `unknown` and blocks another attempt until reconciled.
 
-The HTTP backend has its own session-scoped job store. Its
-research-to-decision path now uses `research_decisions.py` to preserve exclusion
-reasons from the shared research contract. The CLI pipeline's data directory is
-not exposed as HTTP resources; its `result` command reads its saved artifacts.
+The CLI pipeline's data directory is not exposed as HTTP resources; its `result`
+command reads its saved artifacts. The HTTP backend has its own session-scoped
+job store and delegates research decisions to the persistent main agent below.
+
+The new persistent main-agent workflow is available through `python pokescout.py agent`.
+See [main-agent setup and boundaries](docs/Main_Agent.md), or run
+`python pokescout.py agent --data-dir runs/main-agent-demo demo` with Python 3.11+
+for a complete synthetic research, decision, draft and HTTP test-order flow.
 
 **Start with the reproducible local demo. It needs no API keys and performs no real transactions.**
 
