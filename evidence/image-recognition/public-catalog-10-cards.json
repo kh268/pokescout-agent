@@ -1,0 +1,672 @@
+{
+  "mode": "live_api_clean_public_images",
+  "model": "gemini-3.5-flash-lite",
+  "tested_commit": "cba2dbb557be7352bb0bbc294e231b0a584b7e7d",
+  "started_at": "2026-11-14T07:39:20.358949+00:00",
+  "expected_identity_supplied_to_model": false,
+  "sample_count": 10,
+  "attempts": [
+    {
+      "sample": {
+        "catalog_id": "SV2a-201",
+        "catalog_url": "https://api.tcgdex.net/v2/ja/cards/SV2a-201",
+        "image_url": "https://assets.tcgdex.net/ja/SV/SV2a/201/high.png",
+        "expected": {
+          "name": "リザードンex",
+          "set_code": "SV2a",
+          "set_name": "ポケモンカード151",
+          "number": "201/165",
+          "language": "Japanese",
+          "catalog_rarity": "Special illustration rare",
+          "presentation": "raw",
+          "variant": "SAR"
+        },
+        "variant_source": "TCGdex catalog rarity mapped to printed abbreviation"
+      },
+      "result": {
+        "agent": "image_recognition",
+        "observed_at": "2026-11-14T07:39:20.359554+00:00",
+        "ok": true,
+        "requires_confirmation": true,
+        "card": {
+          "name": "リザードンex",
+          "set": "sv2a",
+          "number": "201/165",
+          "language": "Japanese",
+          "variant": "SAR",
+          "year": "2023",
+          "brand": "Pokémon",
+          "presentation": "raw",
+          "grader": null,
+          "grade": null,
+          "grade_text": null,
+          "cert_number": null,
+          "qualifiers": [],
+          "defects": [],
+          "uncertainties": []
+        },
+        "image_sha256": [
+          "ed354c8076375242972afa7a485a59114cef96525e5d732e01ce09d66b8968b6"
+        ],
+        "provider": "Gemini",
+        "configured_model": "gemini-3.5-flash-lite",
+        "returned_model": "gemini-3.5-flash-lite",
+        "request_id": "KRD4ar3TEbuq0-kPw8vS2AI",
+        "status": "candidate; user confirmation required",
+        "physical_authenticity": "not established",
+        "missing_fields": [],
+        "candidate_complete": true,
+        "elapsed_ms": 3432
+      },
+      "checks": {
+        "name": true,
+        "set": true,
+        "number": true,
+        "language": true,
+        "variant": true,
+        "presentation": true,
+        "no_invented_grading": true
+      },
+      "all_identity_checks_passed": true
+    },
+    {
+      "sample": {
+        "catalog_id": "SV2a-168",
+        "catalog_url": "https://api.tcgdex.net/v2/ja/cards/SV2a-168",
+        "image_url": "https://assets.tcgdex.net/ja/SV/SV2a/168/high.png",
+        "expected": {
+          "name": "ヒトカゲ",
+          "set_code": "SV2a",
+          "set_name": "ポケモンカード151",
+          "number": "168/165",
+          "language": "Japanese",
+          "catalog_rarity": "Illustration rare",
+          "presentation": "raw",
+          "variant": "AR"
+        },
+        "variant_source": "TCGdex catalog rarity mapped to printed abbreviation"
+      },
+      "result": {
+        "agent": "image_recognition",
+        "observed_at": "2026-11-14T07:39:35.364744+00:00",
+        "ok": false,
+        "requires_confirmation": true,
+        "error": {
+          "code": "PROVIDER_UNAVAILABLE",
+          "retryable": true,
+          "message": "Provider is temporarily unavailable."
+        },
+        "elapsed_ms": 11558
+      },
+      "checks": {},
+      "all_identity_checks_passed": false
+    },
+    {
+      "sample": {
+        "catalog_id": "SV2a-173",
+        "catalog_url": "https://api.tcgdex.net/v2/ja/cards/SV2a-173",
+        "image_url": "https://assets.tcgdex.net/ja/SV/SV2a/173/high.png",
+        "expected": {
+          "name": "ピカチュウ",
+          "set_code": "SV2a",
+          "set_name": "ポケモンカード151",
+          "number": "173/165",
+          "language": "Japanese",
+          "catalog_rarity": "Illustration rare",
+          "presentation": "raw",
+          "variant": "AR"
+        },
+        "variant_source": "TCGdex catalog rarity mapped to printed abbreviation"
+      },
+      "result": {
+        "agent": "image_recognition",
+        "observed_at": "2026-11-14T07:39:50.369881+00:00",
+        "ok": true,
+        "requires_confirmation": true,
+        "card": {
+          "name": "ピカチュウ",
+          "set": null,
+          "number": "173/165",
+          "language": "Japanese",
+          "variant": "AR",
+          "year": "2023",
+          "brand": "Pokémon",
+          "presentation": "raw",
+          "grader": null,
+          "grade": null,
+          "grade_text": null,
+          "cert_number": null,
+          "qualifiers": [],
+          "defects": [],
+          "uncertainties": []
+        },
+        "image_sha256": [
+          "359d38c891b6901710609d31c2170394f24cf013013ed62eb39a71de05223949"
+        ],
+        "provider": "Gemini",
+        "configured_model": "gemini-3.5-flash-lite",
+        "returned_model": "gemini-3.5-flash-lite",
+        "request_id": "RxD4apVT5draug_13t3BDA",
+        "status": "candidate; user confirmation required",
+        "physical_authenticity": "not established",
+        "missing_fields": [
+          "set"
+        ],
+        "candidate_complete": false,
+        "elapsed_ms": 9425
+      },
+      "checks": {
+        "name": true,
+        "set": false,
+        "number": true,
+        "language": true,
+        "variant": true,
+        "presentation": true,
+        "no_invented_grading": true
+      },
+      "all_identity_checks_passed": false,
+      "manual_review": {
+        "classification": "missing_field",
+        "note": "Set is null. Agent correctly marks candidate incomplete with missing_fields=[set]."
+      }
+    },
+    {
+      "sample": {
+        "catalog_id": "SV2a-166",
+        "catalog_url": "https://api.tcgdex.net/v2/ja/cards/SV2a-166",
+        "image_url": "https://assets.tcgdex.net/ja/SV/SV2a/166/high.png",
+        "expected": {
+          "name": "フシギダネ",
+          "set_code": "SV2a",
+          "set_name": "ポケモンカード151",
+          "number": "166/165",
+          "language": "Japanese",
+          "catalog_rarity": "Illustration rare",
+          "presentation": "raw",
+          "variant": "AR"
+        },
+        "variant_source": "TCGdex catalog rarity mapped to printed abbreviation"
+      },
+      "result": {
+        "agent": "image_recognition",
+        "observed_at": "2026-11-14T07:40:05.373786+00:00",
+        "ok": true,
+        "requires_confirmation": true,
+        "card": {
+          "name": "フシギダネ",
+          "set": "sv2a",
+          "number": "166/165",
+          "language": "Japanese",
+          "variant": "AR",
+          "year": "2023",
+          "brand": "Pokémon",
+          "presentation": "raw",
+          "grader": null,
+          "grade": null,
+          "grade_text": null,
+          "cert_number": null,
+          "qualifiers": [],
+          "defects": [],
+          "uncertainties": []
+        },
+        "image_sha256": [
+          "b9336d26e0e95301fb2323739b541495eb28dfea5681bcd93a1120d3345cc9bc"
+        ],
+        "provider": "Gemini",
+        "configured_model": "gemini-3.5-flash-lite",
+        "returned_model": "gemini-3.5-flash-lite",
+        "request_id": "VhD4ap6sBdPkrfcPuoLg8QY",
+        "status": "candidate; user confirmation required",
+        "physical_authenticity": "not established",
+        "missing_fields": [],
+        "candidate_complete": true,
+        "elapsed_ms": 19598
+      },
+      "checks": {
+        "name": true,
+        "set": true,
+        "number": true,
+        "language": true,
+        "variant": true,
+        "presentation": true,
+        "no_invented_grading": true
+      },
+      "all_identity_checks_passed": true
+    },
+    {
+      "sample": {
+        "catalog_id": "SV2a-170",
+        "catalog_url": "https://api.tcgdex.net/v2/ja/cards/SV2a-170",
+        "image_url": "https://assets.tcgdex.net/ja/SV/SV2a/170/high.png",
+        "expected": {
+          "name": "ゼニガメ",
+          "set_code": "SV2a",
+          "set_name": "ポケモンカード151",
+          "number": "170/165",
+          "language": "Japanese",
+          "catalog_rarity": "Illustration rare",
+          "presentation": "raw",
+          "variant": "AR"
+        },
+        "variant_source": "TCGdex catalog rarity mapped to printed abbreviation"
+      },
+      "result": {
+        "agent": "image_recognition",
+        "observed_at": "2026-11-14T07:40:24.973540+00:00",
+        "ok": true,
+        "requires_confirmation": true,
+        "card": {
+          "name": "ゼニガメ",
+          "set": "sv2a",
+          "number": "170/165",
+          "language": "Japanese",
+          "variant": "AR",
+          "year": "2023",
+          "brand": "Pokémon",
+          "presentation": "raw",
+          "grader": null,
+          "grade": null,
+          "grade_text": null,
+          "cert_number": null,
+          "qualifiers": [],
+          "defects": [],
+          "uncertainties": []
+        },
+        "image_sha256": [
+          "69e87e669b75598eaebecda956831f6bdba82dce32f0524c6ef81f50f20df256"
+        ],
+        "provider": "Gemini",
+        "configured_model": "gemini-3.5-flash-lite",
+        "returned_model": "gemini-3.5-flash-lite",
+        "request_id": "aRD4atDjJeiq9tMPk5HDkQw",
+        "status": "candidate; user confirmation required",
+        "physical_authenticity": "not established",
+        "missing_fields": [],
+        "candidate_complete": true,
+        "elapsed_ms": 14815
+      },
+      "checks": {
+        "name": true,
+        "set": true,
+        "number": true,
+        "language": true,
+        "variant": true,
+        "presentation": true,
+        "no_invented_grading": true
+      },
+      "all_identity_checks_passed": true
+    },
+    {
+      "sample": {
+        "catalog_id": "SV2a-200",
+        "catalog_url": "https://api.tcgdex.net/v2/ja/cards/SV2a-200",
+        "image_url": "https://assets.tcgdex.net/ja/SV/SV2a/200/high.png",
+        "expected": {
+          "name": "フシギバナex",
+          "set_code": "SV2a",
+          "set_name": "ポケモンカード151",
+          "number": "200/165",
+          "language": "Japanese",
+          "catalog_rarity": "Special illustration rare",
+          "presentation": "raw",
+          "variant": "SAR"
+        },
+        "variant_source": "TCGdex catalog rarity mapped to printed abbreviation"
+      },
+      "result": {
+        "agent": "image_recognition",
+        "observed_at": "2026-11-14T07:40:39.975071+00:00",
+        "ok": true,
+        "requires_confirmation": true,
+        "card": {
+          "name": "フシギバナex",
+          "set": "Pokemon Card 151",
+          "number": "200/165",
+          "language": "Japanese",
+          "variant": "SAR",
+          "year": "2023",
+          "brand": "Pokémon",
+          "presentation": "raw",
+          "grader": null,
+          "grade": null,
+          "grade_text": null,
+          "cert_number": null,
+          "qualifiers": [],
+          "defects": [],
+          "uncertainties": [
+            "Set name Pokemon Card 151 is inferred from sv2a code and card style"
+          ]
+        },
+        "image_sha256": [
+          "ce71ca47c289f035b8b14f836fec4f27de16308ea2b4a49dcd5015dec19c26b4"
+        ],
+        "provider": "Gemini",
+        "configured_model": "gemini-3.5-flash-lite",
+        "returned_model": "gemini-3.5-flash-lite",
+        "request_id": "eBD4ap-XIZ3hrfcP4PSvyQY",
+        "status": "candidate; user confirmation required",
+        "physical_authenticity": "not established",
+        "missing_fields": [],
+        "candidate_complete": false,
+        "elapsed_ms": 7342
+      },
+      "checks": {
+        "name": true,
+        "set": false,
+        "number": true,
+        "language": true,
+        "variant": true,
+        "presentation": true,
+        "no_invented_grading": true
+      },
+      "all_identity_checks_passed": false,
+      "manual_review": {
+        "classification": "set_alias_and_uncertainty",
+        "note": "Model returned Pokemon Card 151 rather than catalog original ポケモンカード151/SV2a, and flagged the set name as inferred. Agent correctly marks candidate incomplete. This is not a missing set field."
+      }
+    },
+    {
+      "sample": {
+        "catalog_id": "SV2a-206",
+        "catalog_url": "https://api.tcgdex.net/v2/ja/cards/SV2a-206",
+        "image_url": "https://assets.tcgdex.net/ja/SV/SV2a/206/high.png",
+        "expected": {
+          "name": "エリカの招待",
+          "set_code": "SV2a",
+          "set_name": "ポケモンカード151",
+          "number": "206/165",
+          "language": "Japanese",
+          "catalog_rarity": "Special illustration rare",
+          "presentation": "raw",
+          "variant": "SAR"
+        },
+        "variant_source": "TCGdex catalog rarity mapped to printed abbreviation"
+      },
+      "result": {
+        "agent": "image_recognition",
+        "observed_at": "2026-11-14T07:40:54.980146+00:00",
+        "ok": true,
+        "requires_confirmation": true,
+        "card": {
+          "name": "エリカの招待",
+          "set": "sv2a",
+          "number": "206/165",
+          "language": "Japanese",
+          "variant": "SAR",
+          "year": "2023",
+          "brand": "Pokémon",
+          "presentation": "raw",
+          "grader": null,
+          "grade": null,
+          "grade_text": null,
+          "cert_number": null,
+          "qualifiers": [],
+          "defects": [],
+          "uncertainties": []
+        },
+        "image_sha256": [
+          "3071d0dbf3d716fe3e99aa298b48913f626a60a1c1c47eb3de227402598c9be3"
+        ],
+        "provider": "Gemini",
+        "configured_model": "gemini-3.5-flash-lite",
+        "returned_model": "gemini-3.5-flash-lite",
+        "request_id": "hxD4atyYKt-WosUP5deJkQg",
+        "status": "candidate; user confirmation required",
+        "physical_authenticity": "not established",
+        "missing_fields": [],
+        "candidate_complete": true,
+        "elapsed_ms": 10735
+      },
+      "checks": {
+        "name": true,
+        "set": true,
+        "number": true,
+        "language": true,
+        "variant": true,
+        "presentation": true,
+        "no_invented_grading": true
+      },
+      "all_identity_checks_passed": true
+    },
+    {
+      "sample": {
+        "catalog_id": "SV3-134",
+        "catalog_url": "https://api.tcgdex.net/v2/ja/cards/SV3-134",
+        "image_url": "https://assets.tcgdex.net/ja/SV/SV3/134/high.png",
+        "expected": {
+          "name": "リザードンex",
+          "set_code": "SV3",
+          "set_name": "黒炎の支配者",
+          "number": "134/108",
+          "language": "Japanese",
+          "catalog_rarity": null,
+          "variant": "SAR",
+          "presentation": "raw"
+        },
+        "variant_source": "Printed abbreviation visually inspected in public image; catalog rarity absent"
+      },
+      "result": {
+        "agent": "image_recognition",
+        "observed_at": "2026-11-14T07:41:09.985267+00:00",
+        "ok": true,
+        "requires_confirmation": true,
+        "card": {
+          "name": "リザードンex",
+          "set": "Ruler of the Black Flame",
+          "number": "134/108",
+          "language": "Japanese",
+          "variant": "Special Illustration Rare (SAR)",
+          "year": "2023",
+          "brand": "Pokémon",
+          "presentation": "raw",
+          "grader": null,
+          "grade": null,
+          "grade_text": null,
+          "cert_number": null,
+          "qualifiers": [],
+          "defects": [],
+          "uncertainties": []
+        },
+        "image_sha256": [
+          "913b04b0a48b3f45f2f3ef765ead4461a0f2f9c625e92a84705b841634ddff4c"
+        ],
+        "provider": "Gemini",
+        "configured_model": "gemini-3.5-flash-lite",
+        "returned_model": "gemini-3.5-flash-lite",
+        "request_id": "lhD4aqm8JJWh1e8P_-GCqQw",
+        "status": "candidate; user confirmation required",
+        "physical_authenticity": "not established",
+        "missing_fields": [],
+        "candidate_complete": true,
+        "elapsed_ms": 36545
+      },
+      "checks": {
+        "name": true,
+        "set": false,
+        "number": true,
+        "language": true,
+        "variant": false,
+        "presentation": true,
+        "no_invented_grading": true
+      },
+      "all_identity_checks_passed": false,
+      "manual_review": {
+        "classification": "set_and_rarity_aliases",
+        "note": "Model returned Ruler of the Black Flame and Special Illustration Rare (SAR). These are translation/format differences from 黒炎の支配者/SV3 and SAR, not evidence of a different card. The current exact-string comparison does not canonicalize them. candidate_complete only reports field presence, not catalog verification."
+      }
+    },
+    {
+      "sample": {
+        "catalog_id": "SV4a-349",
+        "catalog_url": "https://api.tcgdex.net/v2/ja/cards/SV4a-349",
+        "image_url": "https://assets.tcgdex.net/ja/SV/SV4a/349/high.png",
+        "expected": {
+          "name": "リザードンex",
+          "set_code": "SV4a",
+          "set_name": "シャイニートレジャーex",
+          "number": "349/190",
+          "language": "Japanese",
+          "catalog_rarity": null,
+          "variant": "SAR",
+          "presentation": "raw"
+        },
+        "variant_source": "Printed abbreviation visually inspected in public image; catalog rarity absent"
+      },
+      "result": {
+        "agent": "image_recognition",
+        "observed_at": "2026-11-14T07:41:46.532669+00:00",
+        "ok": true,
+        "requires_confirmation": true,
+        "card": {
+          "name": "リザードンex",
+          "set": "sv4a",
+          "number": "349/190",
+          "language": "Japanese",
+          "variant": "SAR",
+          "year": "2023",
+          "brand": "Pokémon",
+          "presentation": "raw",
+          "grader": null,
+          "grade": null,
+          "grade_text": null,
+          "cert_number": null,
+          "qualifiers": [],
+          "defects": [],
+          "uncertainties": []
+        },
+        "image_sha256": [
+          "437b09fc695cfdbf63822f14a3198ecaa7052ab0285c7d3f2774ad89db347852"
+        ],
+        "provider": "Gemini",
+        "configured_model": "gemini-3.5-flash-lite",
+        "returned_model": "gemini-3.5-flash-lite",
+        "request_id": "uxD4ap7TFcvarfcP646V6A8",
+        "status": "candidate; user confirmation required",
+        "physical_authenticity": "not established",
+        "missing_fields": [],
+        "candidate_complete": true,
+        "elapsed_ms": 12398
+      },
+      "checks": {
+        "name": true,
+        "set": true,
+        "number": true,
+        "language": true,
+        "variant": true,
+        "presentation": true,
+        "no_invented_grading": true
+      },
+      "all_identity_checks_passed": true
+    },
+    {
+      "sample": {
+        "catalog_id": "SV4a-331",
+        "catalog_url": "https://api.tcgdex.net/v2/ja/cards/SV4a-331",
+        "image_url": "https://assets.tcgdex.net/ja/SV/SV4a/331/high.png",
+        "expected": {
+          "name": "リザードンex",
+          "set_code": "SV4a",
+          "set_name": "シャイニートレジャーex",
+          "number": "331/190",
+          "language": "Japanese",
+          "catalog_rarity": null,
+          "variant": "SSR",
+          "presentation": "raw"
+        },
+        "variant_source": "Printed abbreviation visually inspected in public image; catalog rarity absent"
+      },
+      "result": {
+        "agent": "image_recognition",
+        "observed_at": "2026-11-14T07:42:01.538021+00:00",
+        "ok": true,
+        "requires_confirmation": true,
+        "card": {
+          "name": "リザードンex",
+          "set": "sv4a",
+          "number": "331/190",
+          "language": "Japanese",
+          "variant": "SSR",
+          "year": "2023",
+          "brand": "Pokémon",
+          "presentation": "raw",
+          "grader": null,
+          "grade": null,
+          "grade_text": null,
+          "cert_number": null,
+          "qualifiers": [],
+          "defects": [],
+          "uncertainties": []
+        },
+        "image_sha256": [
+          "61397cf1d7a7ebd6fd8b18a800342d729206222b545f4e0f3ff9c55c968d6e05"
+        ],
+        "provider": "Gemini",
+        "configured_model": "gemini-3.5-flash-lite",
+        "returned_model": "gemini-3.5-flash-lite",
+        "request_id": "yhD4aqTCFrnZ9tMP1dOB6AQ",
+        "status": "candidate; user confirmation required",
+        "physical_authenticity": "not established",
+        "missing_fields": [],
+        "candidate_complete": true,
+        "elapsed_ms": 18017
+      },
+      "checks": {
+        "name": true,
+        "set": true,
+        "number": true,
+        "language": true,
+        "variant": true,
+        "presentation": true,
+        "no_invented_grading": true
+      },
+      "all_identity_checks_passed": true
+    }
+  ],
+  "limitations": [
+    "Clean public catalog images only; not real user photographs.",
+    "Ten selected examples do not establish general accuracy.",
+    "No slabs, glare, blur or partial images in this evaluation.",
+    "Three catalog records lack rarity; printed rarity was visually inspected."
+  ],
+  "temporary_key_deleted": true,
+  "finished_at": "2026-11-14T07:42:19.561952+00:00",
+  "summary": {
+    "attempted": 10,
+    "extraction_succeeded": 9,
+    "all_identity_checks_passed": 6,
+    "per_field_matches": {
+      "name": 9,
+      "set": 6,
+      "number": 9,
+      "language": 9,
+      "variant": 8,
+      "presentation": 9,
+      "no_invented_grading": 9
+    },
+    "median_success_seconds": 12.4,
+    "unattempted": 0,
+    "returned_models": {
+      "gemini-3.5-flash-lite": 9
+    },
+    "candidate_complete_count": 7,
+    "manual_classification": {
+      "strict_identity_matches": 6,
+      "set_or_rarity_alias_differences": 2,
+      "missing_set": 1,
+      "provider_failure": 1
+    },
+    "successful_latency_range_seconds": [
+      3.43,
+      36.55
+    ]
+  },
+  "evaluation_rules": {
+    "normalization": "NFKC, whitespace removal and case-folding only.",
+    "name": "Exact normalized catalog name.",
+    "set": "Catalog set code or original catalog set name; English translations are not automatically accepted.",
+    "number": "Exact printed numerator/denominator.",
+    "language": "Japanese, ja, jp or 日本語.",
+    "variant": "Printed rarity abbreviation; expanded descriptions are not automatically accepted.",
+    "interpretation": "Strict contract matching, not a general recognition accuracy estimate. Manual notes below do not alter the recorded checks."
+  }
+}

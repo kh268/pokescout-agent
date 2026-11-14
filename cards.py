@@ -1,11 +1,14 @@
 """Validated card intake and explicit PSA evidence comparison; no authentication claim."""
 from __future__ import annotations
 import hashlib
+from io import BytesIO
 import json
 import os
 import re
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
+
+DEFAULT_GEMINI_MODEL='gemini-3.5-flash-lite'
 
 IDENTITY_FIELDS=('name','set','number','language','variant')
 TEXT_FIELDS=IDENTITY_FIELDS+('year','brand','presentation','grader','grade','grade_text','cert_number')
@@ -63,19 +66,27 @@ def compare_psa(card,registry):
             'missing':missing,'mismatches':mismatches,'source':'user_supplied_record; not fetched by PokéScout',
             'physical_authenticity':'not established'}
 
-def identify(images):
+def identify(images, *, model=None):
     if not os.environ.get('GEMINI_API_KEY'):raise ValueError('GEMINI_API_KEY is not configured.')
+    if not isinstance(images,(list,tuple)) or not 1<=len(images)<=4:
+        raise ValueError('Provide 1–4 image paths for one card.')
+    selected_model=model if model is not None else (os.environ.get('GEMINI_MODEL') or DEFAULT_GEMINI_MODEL)
+    if not isinstance(selected_model,str) or not selected_model.strip():
+        raise ValueError('Provide a nonempty Gemini model identifier.')
     try:
         from google import genai
         from google.genai import types
         from PIL import Image
     except ImportError:raise ValueError('Install requirements-vision.txt for image intake.') from None
-    if not 1<=len(images)<=4:raise ValueError('Provide 1–4 images.')
     parts=[]; hashes=[]; total=0
     for file in images:
-        p=Path(file);raw=p.read_bytes();total+=len(raw)
+        if not isinstance(file,(str,Path)):
+            raise ValueError('Each image must be a local file path.')
+        p=Path(file)
+        with p.open('rb') as stream:raw=stream.read(12_000_001-total)
+        total+=len(raw)
         if total>12_000_000:raise ValueError('Images exceed 12 MB combined limit.')
-        with Image.open(p) as image:
+        with Image.open(BytesIO(raw)) as image:
             image.verify();mime=Image.MIME.get(image.format)
         if mime not in ('image/jpeg','image/png','image/webp'):raise ValueError('Use JPEG, PNG or WebP.')
         hashes.append(hashlib.sha256(raw).hexdigest())
@@ -85,11 +96,17 @@ def identify(images):
             'presentation is raw or slabbed. Never grade raw cards or claim authenticity. '
             'Grade and year are strings. Separate disclosed/visible defects from uncertainty. '
             'No inferred perfect condition. Identity will be confirmed by a user.')
-    model=os.environ.get('GEMINI_MODEL') or 'gemini-3.8-flash'
-    with genai.Client(api_key=os.environ['GEMINI_API_KEY'],http_options={'timeout':65000}) as client:
-        response=client.models.generate_content(model=model,contents=[prompt,*parts],
+    with genai.Client(api_key=os.environ['GEMINI_API_KEY'],
+            http_options={'timeout':65000,'retry_options':{'attempts':1}}) as client:
+        response=client.models.generate_content(model=selected_model,contents=[prompt,*parts],
             config={'response_mime_type':'application/json','response_json_schema':CARD_SCHEMA})
-    card=validate_card(json.loads(response.text))
-    return {'card':card,'image_sha256':hashes,'provider':'Gemini','configured_model':model,
+    try:
+        parsed=json.loads(response.text)
+        if not isinstance(parsed,dict) or set(parsed)!=set(CARD_SCHEMA['required']):
+            raise ValueError('Missing or unexpected card fields.')
+        card=validate_card(parsed)
+    except (ValueError,TypeError) as error:
+        raise ValueError('Gemini response failed card schema validation.') from error
+    return {'card':card,'image_sha256':hashes,'provider':'Gemini','configured_model':selected_model,
             'returned_model':getattr(response,'model_version',None),'request_id':getattr(response,'response_id',None),
             'status':'candidate; user confirmation required','physical_authenticity':'not established'}
